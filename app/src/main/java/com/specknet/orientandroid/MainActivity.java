@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
     private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E";
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
-    private static final boolean raw = false;
+    private static final boolean raw = true;
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
@@ -100,20 +100,21 @@ public class MainActivity extends Activity {
         packetData.put(bytes);
         packetData.position(0);
 
-        float accel_x = packetData.getShort() / 1024.f;
+        float accel_x = packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
         float accel_y = packetData.getShort() / 1024.f;
         float accel_z = packetData.getShort() / 1024.f;
 
-        int gyro_x = packetData.getShort();
-        int gyro_y = packetData.getShort();
-        int gyro_z = packetData.getShort();
+        float gyro_x = packetData.getShort() / 32.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
+        float gyro_y = packetData.getShort() / 32.f;
+        float gyro_z = packetData.getShort() / 32.f;
 
-        int mag_x = packetData.getShort();
-        int mag_y = packetData.getShort();
-        int mag_z = packetData.getShort();
+        float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
+        float mag_y = packetData.getShort() / 16.f;
+        float mag_z = packetData.getShort() / 16.f;
 
         Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
-        //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
-        //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
+        Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
+        if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
+            Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
     }
 }
