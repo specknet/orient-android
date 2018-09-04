@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
     private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E";
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
-    private static final boolean raw = true;
+    private static final boolean raw = false;
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
@@ -92,7 +92,13 @@ public class MainActivity extends Activity {
         int y = packetData.getInt();
         int z = packetData.getInt();
 
-        Log.i("OrientAndroid", "Quat: (w=" + w + ", x=" + x + ", y=" + y + ", z=" + z + ")");
+        double dw = w / 1073741824.0;  // 2^30
+        double dx = x / 1073741824.0;
+        double dy = y / 1073741824.0;
+        double dz = z / 1073741824.0;
+
+        Log.i("OrientAndroid", "QuatInt: (w=" + w + ", x=" + x + ", y=" + y + ", z=" + z + ")");
+        Log.i("OrientAndroid", "QuatDbl: (w=" + dw + ", x=" + dx + ", y=" + dy + ", z=" + dz + ")");
     }
 
     private void handleRawPacket(final byte[] bytes) {
