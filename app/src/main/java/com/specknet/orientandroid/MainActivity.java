@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
     private ByteBuffer packetData;
+    private int n = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +72,11 @@ public class MainActivity extends Activity {
                 .flatMap(notificationObservable -> notificationObservable) // <-- Notification has been set up, now observe value changes.
                 .subscribe(
                         bytes -> {
+                            n += 1;
                             // Given characteristic has been changes, here is the value.
-                            Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
-                            if (raw) handleRawPacket(bytes); else handleQuatPacket(bytes);
+                            if (n % 25 == 0)
+                                Log.i("OrientAndroid", Integer.toString(n));
+                            //if (raw) handleRawPacket(bytes); else handleQuatPacket(bytes);
                         },
                         throwable -> {
                             // Handle an error here.
