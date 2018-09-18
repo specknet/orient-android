@@ -67,6 +67,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private TextView gyroTextView;
 
     private Spinner positionSpinner;
+    private Spinner groupSpinner;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,25 +84,28 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         accelTextView = findViewById(R.id.accelTextView);
         gyroTextView = findViewById(R.id.gyroTextView);
         positionSpinner = findViewById(R.id.positionSpinner);
+        groupSpinner = findViewById(R.id.groupSpinner);
 
         positionSpinner.setOnItemSelectedListener(this);
-        List<String> list = new ArrayList<String>();
-        list.add("RANJITH");
-        list.add("ARUN");
-        list.add("JEESMON");
-        list.add("NISAM");
-        list.add("SREEJITH");
-        list.add("SANJAY");
-        list.add("AKSHY");
-        list.add("FIROZ");
-        list.add("RAHUL");
-        list.add("ARJUN");
-        list.add("SAVIYO");
-        list.add("VISHNU");
+        groupSpinner.setOnItemSelectedListener(this);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
+        List<String> position_list = new ArrayList<String>();
+        position_list.add("POSITION");
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, position_list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         positionSpinner.setAdapter(adapter);
+
+        List<String> group_list = new ArrayList<String>();
+        group_list.add("GROUP");
+        for (char c = 'A'; c <= 'Z'; c++){
+            group_list.add(String.valueOf(c));
+        }
+
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, group_list);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        groupSpinner.setAdapter(adapter2);
 
 
 
