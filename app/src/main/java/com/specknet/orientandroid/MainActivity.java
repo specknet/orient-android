@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.opencsv.CSVWriter;
@@ -41,6 +42,7 @@ public class MainActivity extends Activity {
 
     private int n = 0;
     private Long connected_timestamp = null;
+    private Long capture_started_timestamp = null;
     boolean connected = false;
 
     private int counter = 0;
@@ -52,6 +54,7 @@ public class MainActivity extends Activity {
     private Button start_button;
     private Button stop_button;
     private Context ctx;
+    private TextView captureTimetextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,7 @@ public class MainActivity extends Activity {
 
         start_button = findViewById(R.id.start_button);
         stop_button = findViewById(R.id.stop_button);
+        captureTimetextView = findViewById(R.id.captureTimetextView);
 
         path = Environment.getExternalStorageDirectory();
 
@@ -85,6 +89,7 @@ public class MainActivity extends Activity {
             }
 
             logging = true;
+            capture_started_timestamp = System.currentTimeMillis();
             counter = 0;
             Toast.makeText(this,"Start logging",
                     Toast.LENGTH_SHORT).show();
@@ -94,8 +99,14 @@ public class MainActivity extends Activity {
         stop_button.setOnClickListener(v-> {
             logging = false;
             stop_button.setEnabled(false);
-            Toast.makeText(this,"Stop logging",
-                    Toast.LENGTH_SHORT).show();
+            try {
+                writer.flush();
+                writer.close();
+                Toast.makeText(this,"Recording saved",
+                        Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Log.e("MainActivity", "Caught IOException: " + e.getMessage());
+            }
             start_button.setEnabled(true);
         });
 
@@ -227,10 +238,27 @@ public class MainActivity extends Activity {
                     Float.toString(gyro_z),
             };
             writer.writeNext(entries);
-            try {
-                writer.flush();
-            } catch (IOException e) {
-                Log.e("MainActivity", "Caught IOException: " + e.getMessage());
+
+            if (counter % 25 == 0) {
+                long elapsed_time = System.currentTimeMillis() - capture_started_timestamp;
+                int total_secs = (int)elapsed_time / 1000;
+                int s = total_secs % 60;
+                int m = total_secs / 60;
+
+                String m_str = Integer.toString(m);
+                if (m_str.length() < 2) {
+                    m_str = "0" + m_str;
+                }
+
+                String s_str = Integer.toString(s);
+                if (s_str.length() < 2) {
+                    s_str = "0" + s_str;
+                }
+
+                String time_str = m_str + ":" + s_str;
+                runOnUiThread(() -> {
+                    captureTimetextView.setText(time_str);
+                });
             }
             counter += 1;
         }
