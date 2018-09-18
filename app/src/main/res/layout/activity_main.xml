@@ -6,126 +6,234 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/label1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Group"
+        android:textStyle="bold" />
+
     <Spinner
         android:id="@+id/groupSpinner"
-        android:layout_width="288dp"
+        android:layout_width="250dp"
         android:layout_height="34dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+
         />
+
+    <TextView
+        android:id="@+id/label2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Subject"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/nameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="name"
+        />
+
+    <TextView
+        android:id="@+id/label9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Activity Type"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/activitySpinner"
+        android:layout_width="250dp"
+        android:layout_height="34dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Name"
-         />
+        />
+
+    <TextView
+        android:id="@+id/label3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Sensor Position"
+        android:textStyle="bold" />
 
     <Spinner
         android:id="@+id/positionSpinner"
-        android:layout_width="288dp"
+        android:layout_width="250dp"
         android:layout_height="34dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="1dp"
         />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
-        <RadioGroup
-            android:id="@+id/radioSide"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:orientation='horizontal'
-            >
+            android:orientation="vertical" >
 
-            <RadioButton
-                android:id="@+id/radioLeft"
+            <TextView
+                android:id="@+id/label4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Left" />
+                android:layout_marginStart="16dp"
+                android:text="Side of body"
+                android:textStyle="bold" />
 
-            <RadioButton
-                android:id="@+id/radioRight"
+
+            <RadioGroup
+                android:id="@+id/radioSide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Right" />
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:orientation='horizontal'
+                >
 
-        </RadioGroup>
+                <RadioButton
+                    android:id="@+id/radioLeft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Left" />
 
+                <RadioButton
+                    android:id="@+id/radioRight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Right" />
 
+            </RadioGroup>
 
-        <RadioGroup
-            android:id="@+id/radioOrientation"
+            <TextView
+                android:id="@+id/label5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Sensor Orientation"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/radioOrientation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:orientation='horizontal'
+                >
+
+                <RadioButton
+                    android:id="@+id/radioNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Normal" />
+
+                <RadioButton
+                    android:id="@+id/radioRandom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Random" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:orientation='horizontal'
-            >
+            android:orientation="vertical" >
 
-            <RadioButton
-                android:id="@+id/radioNormal"
+
+
+            <TextView
+                android:id="@+id/label6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Standard orientation" />
+                android:layout_marginStart="16dp"
+                android:text="Sensor Mounting"
+                android:textStyle="bold" />
 
-            <RadioButton
-                android:id="@+id/radioRandom"
+            <RadioGroup
+                android:id="@+id/radioMouting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Random" />
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:orientation='horizontal'
+                >
 
-        </RadioGroup>
+                <RadioButton
+                    android:id="@+id/radioAttached"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Body" />
 
+                <RadioButton
+                    android:id="@+id/radioPocket"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pocket" />
 
-
-        <RadioGroup
-            android:id="@+id/radioMouting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:orientation='horizontal'
-            >
-
-            <RadioButton
-                android:id="@+id/radioAttached"
+            </RadioGroup>
+            <TextView
+                android:id="@+id/label8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Attached" />
+                android:layout_marginStart="16dp"
+                android:text="Number of Steps"
+                android:textStyle="bold" />
 
-            <RadioButton
-                android:id="@+id/radioPocket"
+            <RadioGroup
+                android:id="@+id/radioSteps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="In pocket" />
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:orientation='horizontal'
+                >
 
-        </RadioGroup>
+                <RadioButton
+                    android:id="@+id/radio10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="10" />
 
+                <RadioButton
+                    android:id="@+id/radio30"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30" />
+
+                <RadioButton
+                    android:id="@+id/radio100"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100" />
+
+            </RadioGroup>
+        </LinearLayout>
     </LinearLayout>
 
 
+    <TextView
+        android:id="@+id/label7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Notes"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/notesEditText"
@@ -133,8 +241,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Notes"
+        android:hint="notes"
         />
 
     <TextView
@@ -148,15 +255,14 @@
     <TextView
         android:id="@+id/accelTextView"
         android:layout_width="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:text=""
         />
 
     <TextView
         android:id="@+id/gyroTextView"
         android:layout_width="wrap_content"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:text=""
         />
 
@@ -171,29 +277,16 @@
             android:layout_height="wrap_content"
             android:enabled="false"
             android:text="Start"
-            android:layout_marginTop="30dp"
             android:layout_marginRight="50dp"
             android:layout_marginLeft="60dp"
-             />
+            />
 
         <Button
             android:id="@+id/stop_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:enabled="false"
-            android:layout_marginTop="30dp"
             android:text="Stop" />
 
     </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
 </LinearLayout>
