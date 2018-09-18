@@ -55,6 +55,8 @@ public class MainActivity extends Activity {
     private Button stop_button;
     private Context ctx;
     private TextView captureTimetextView;
+    private TextView accelTextView;
+    private TextView gyroTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,8 @@ public class MainActivity extends Activity {
         start_button = findViewById(R.id.start_button);
         stop_button = findViewById(R.id.stop_button);
         captureTimetextView = findViewById(R.id.captureTimetextView);
+        accelTextView = findViewById(R.id.accelTextView);
+        gyroTextView = findViewById(R.id.gyroTextView);
 
         path = Environment.getExternalStorageDirectory();
 
@@ -138,6 +142,10 @@ public class MainActivity extends Activity {
                         },
                         throwable -> {
                             // Handle an error here.
+                            runOnUiThread(() -> {
+                                Toast.makeText(ctx, "BLE scanning error",
+                                        Toast.LENGTH_SHORT).show();
+                            });
                         }
                 );
 
@@ -221,8 +229,8 @@ public class MainActivity extends Activity {
         float mag_y = packetData.getShort() / 16.f;
         float mag_z = packetData.getShort() / 16.f;
 
-        Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
-        Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
+        //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
+        //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
         if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
@@ -256,10 +264,17 @@ public class MainActivity extends Activity {
                 }
 
                 String time_str = m_str + ":" + s_str;
+
+                String accel_str = "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")";
+                String gyro_str = "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")";
+
                 runOnUiThread(() -> {
                     captureTimetextView.setText(time_str);
+                    accelTextView.setText(accel_str);
+                    gyroTextView.setText(gyro_str);
                 });
             }
+
             counter += 1;
         }
     }
