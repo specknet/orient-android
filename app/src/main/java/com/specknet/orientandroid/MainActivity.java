@@ -19,15 +19,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends Activity {
 
-    private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E";
+    //private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E"; // test device
+    private static final String ORIENT_BLE_ADDRESS = "F2:6D:63:1F:17:33"; // green
+
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
+
     private static final boolean raw = true;
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
@@ -35,10 +40,10 @@ public class MainActivity extends Activity {
     private ByteBuffer packetData;
 
     private int n = 0;
-
+    private Long connected_timestamp = null;
     boolean connected = false;
 
-    private static int counter=0;
+    private int counter = 0;
     private CSVWriter writer;
     private File path;
     private File file;
@@ -57,28 +62,42 @@ public class MainActivity extends Activity {
         start_button = findViewById(R.id.start_button);
         stop_button = findViewById(R.id.stop_button);
 
+        path = Environment.getExternalStorageDirectory();
+
         start_button.setOnClickListener(v-> {
+            start_button.setEnabled(false);
             // make a new filename based on the start timestamp
+            String file_ts = new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new Date());
+            file = new File(path, "PdIoT_" + file_ts + ".csv");
+
+            try {
+                writer = new CSVWriter(new FileWriter(file), ',');
+            } catch (IOException e) {
+                Log.e("MainActivity", "Caught IOException: " + e.getMessage());
+            }
+
+            String[] entries = "timestamp#seq#accel_x#accel_y#accel_z#gyro_x#gyro_y#gyro_z".split("#");
+            writer.writeNext(entries);
+            try {
+                writer.flush();
+            } catch (IOException e) {
+                Log.e("MainActivity", "Caught IOException: " + e.getMessage());
+            }
 
             logging = true;
+            counter = 0;
             Toast.makeText(this,"Start logging",
                     Toast.LENGTH_SHORT).show();
+            stop_button.setEnabled(true);
         });
 
         stop_button.setOnClickListener(v-> {
             logging = false;
+            stop_button.setEnabled(false);
             Toast.makeText(this,"Stop logging",
                     Toast.LENGTH_SHORT).show();
+            start_button.setEnabled(true);
         });
-
-        path = Environment.getExternalStorageDirectory();
-        file = new File(path, "pdiot.csv");
-
-        try {
-            writer = new CSVWriter(new FileWriter(file), ',');
-        } catch (IOException e) {
-            Log.e("MainActivity", "Caught IOException: " + e.getMessage());
-        }
 
         packetData = ByteBuffer.allocate(18);
         packetData.order(ByteOrder.LITTLE_ENDIAN);
@@ -128,15 +147,21 @@ public class MainActivity extends Activity {
                             n += 1;
                             // Given characteristic has been changes, here is the value.
 
-                            if (n % 25 == 0)
-                                Log.i("OrientAndroid", Integer.toString(n));
+                            if (n % 25 == 0) {
+                                Long elapsed_connection_time = System.currentTimeMillis() - connected_timestamp;
+                                float connected_secs = elapsed_connection_time / 1000.f;
+                                float freq = n / connected_secs;
+                                Log.i("OrientAndroid", "Packet count: " + Integer.toString(n) + ", Freq: " + Float.toString(freq));
+                            }
 
-                            Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
+                            //Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
                             if (!connected) {
                                 connected = true;
+                                connected_timestamp = System.currentTimeMillis();
                                 runOnUiThread(() -> {
                                                                Toast.makeText(ctx, "Receiving sensor data",
                                                                        Toast.LENGTH_SHORT).show();
+                                    start_button.setEnabled(true);
                                                            });
                             }
                             if (raw) handleRawPacket(bytes); else handleQuatPacket(bytes);
@@ -168,6 +193,7 @@ public class MainActivity extends Activity {
     }
 
     private void handleRawPacket(final byte[] bytes) {
+        long ts = System.currentTimeMillis();
         packetData.clear();
         packetData.put(bytes);
         packetData.position(0);
@@ -190,13 +216,23 @@ public class MainActivity extends Activity {
             Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
         if (logging) {
-            String[] entries = "first#second#third".split("#");
+            //String[] entries = "first#second#third".split("#");
+            String[] entries = {Long.toString(ts),
+                    Integer.toString(counter),
+                    Float.toString(accel_x),
+                    Float.toString(accel_y),
+                    Float.toString(accel_z),
+                    Float.toString(gyro_x),
+                    Float.toString(gyro_y),
+                    Float.toString(gyro_z),
+            };
             writer.writeNext(entries);
             try {
                 writer.flush();
             } catch (IOException e) {
                 Log.e("MainActivity", "Caught IOException: " + e.getMessage());
             }
+            counter += 1;
         }
     }
 
