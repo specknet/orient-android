@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,12 +27,14 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import io.reactivex.disposables.Disposable;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     //private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E"; // test device
     private static String ORIENT_BLE_ADDRESS;
@@ -61,6 +66,8 @@ public class MainActivity extends Activity {
     private TextView accelTextView;
     private TextView gyroTextView;
 
+    private Spinner positionSpinner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +81,28 @@ public class MainActivity extends Activity {
         captureTimetextView = findViewById(R.id.captureTimetextView);
         accelTextView = findViewById(R.id.accelTextView);
         gyroTextView = findViewById(R.id.gyroTextView);
+        positionSpinner = findViewById(R.id.positionSpinner);
+
+        positionSpinner.setOnItemSelectedListener(this);
+        List<String> list = new ArrayList<String>();
+        list.add("RANJITH");
+        list.add("ARUN");
+        list.add("JEESMON");
+        list.add("NISAM");
+        list.add("SREEJITH");
+        list.add("SANJAY");
+        list.add("AKSHY");
+        list.add("FIROZ");
+        list.add("RAHUL");
+        list.add("ARJUN");
+        list.add("SAVIYO");
+        list.add("VISHNU");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        positionSpinner.setAdapter(adapter);
+
+
 
         try {
             FileInputStream fis = new FileInputStream(path + "/" + "orient.ble");
@@ -165,6 +194,20 @@ public class MainActivity extends Activity {
                 );
 
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position,
+                               long id) {
+        // TODO Auto-generated method stub
+        Toast.makeText(this, "YOUR SELECTION IS : " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // TODO Auto-generated method stub
+        Toast.makeText(this, "YOUR SELECTION IS : " , Toast.LENGTH_SHORT).show();
+    }
+
     private void connectToOrient(String addr) {
         orient_device = rxBleClient.getBleDevice(addr);
         String characteristic;
