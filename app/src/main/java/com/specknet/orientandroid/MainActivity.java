@@ -69,6 +69,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private Spinner positionSpinner;
     private Spinner groupSpinner;
 
+    private String group = null;
+    private String position = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +94,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         List<String> position_list = new ArrayList<String>();
         position_list.add("POSITION");
+        position_list.add("Wrist");
+        position_list.add("Upper arm");
+        position_list.add("Torso");
+        position_list.add("Upper Leg");
+        position_list.add("Lower Leg");
+        position_list.add("Foot");
+
 
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, position_list);
@@ -204,13 +214,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     public void onItemSelected(AdapterView<?> parent, View view, int position,
                                long id) {
         // TODO Auto-generated method stub
-        Toast.makeText(this, "YOUR SELECTION IS : " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+        if (parent.getId() == groupSpinner.getId()) {
+            Toast.makeText(this, "GROUP : " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+            group = parent.getItemAtPosition(position).toString();
+        }
+        else if (parent.getId() == positionSpinner.getId()) {
+            Toast.makeText(this, "POSITION : " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+            this.position = parent.getItemAtPosition(position).toString();
+        }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         // TODO Auto-generated method stub
-        Toast.makeText(this, "YOUR SELECTION IS : " , Toast.LENGTH_SHORT).show();
     }
 
     private void connectToOrient(String addr) {
