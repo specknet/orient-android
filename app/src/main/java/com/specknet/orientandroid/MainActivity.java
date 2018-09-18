@@ -15,9 +15,12 @@ import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
 import com.polidea.rxandroidble2.scan.ScanSettings;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
@@ -29,7 +32,7 @@ import io.reactivex.disposables.Disposable;
 public class MainActivity extends Activity {
 
     //private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E"; // test device
-    private static final String ORIENT_BLE_ADDRESS = "F2:6D:63:1F:17:33"; // green
+    private static String ORIENT_BLE_ADDRESS;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
@@ -64,13 +67,25 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         ctx = this;
 
+        path = Environment.getExternalStorageDirectory();
+
         start_button = findViewById(R.id.start_button);
         stop_button = findViewById(R.id.stop_button);
         captureTimetextView = findViewById(R.id.captureTimetextView);
         accelTextView = findViewById(R.id.accelTextView);
         gyroTextView = findViewById(R.id.gyroTextView);
 
-        path = Environment.getExternalStorageDirectory();
+        try {
+            FileInputStream fis = new FileInputStream(path + "/" + "orient.ble");
+            BufferedReader bfr = new BufferedReader(new InputStreamReader(fis));
+            String ble_string = bfr.readLine();
+            ORIENT_BLE_ADDRESS = ble_string;
+        }
+        catch (IOException e) {
+            Log.e("MainActivity", "Error reading orient.ble file");
+            Toast.makeText(this,"Error reading orient.ble file",
+                    Toast.LENGTH_SHORT).show();
+        }
 
         start_button.setOnClickListener(v-> {
             start_button.setEnabled(false);
