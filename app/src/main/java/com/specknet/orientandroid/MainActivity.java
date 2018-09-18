@@ -1,13 +1,22 @@
 package com.specknet.orientandroid;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
+import com.opencsv.CSVWriter;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
 import com.polidea.rxandroidble2.scan.ScanSettings;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.UUID;
@@ -19,16 +28,54 @@ public class MainActivity extends Activity {
     private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E";
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
-    private static final boolean raw = false;
+    private static final boolean raw = true;
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
     private ByteBuffer packetData;
+    boolean connected = false;
+
+    private static int counter=0;
+    private CSVWriter writer;
+    private File path;
+    private File file;
+    private boolean logging = false;
+
+    private Button start_button;
+    private Button stop_button;
+    private Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ctx = this;
+
+        start_button = findViewById(R.id.start_button);
+        stop_button = findViewById(R.id.stop_button);
+
+        start_button.setOnClickListener(v-> {
+            // make a new filename based on the start timestamp
+
+            logging = true;
+            Toast.makeText(this,"Start logging",
+                    Toast.LENGTH_SHORT).show();
+        });
+
+        stop_button.setOnClickListener(v-> {
+            logging = false;
+            Toast.makeText(this,"Stop logging",
+                    Toast.LENGTH_SHORT).show();
+        });
+
+        path = Environment.getExternalStorageDirectory();
+        file = new File(path, "pdiot.csv");
+
+        try {
+            writer = new CSVWriter(new FileWriter(file), ',');
+        } catch (IOException e) {
+            Log.e("MainActivity", "Caught IOException: " + e.getMessage());
+        }
 
         packetData = ByteBuffer.allocate(18);
         packetData.order(ByteOrder.LITTLE_ENDIAN);
@@ -48,6 +95,10 @@ public class MainActivity extends Activity {
                                     scanResult.getBleDevice().getMacAddress());
                             // Process scan result here.
                             if (scanResult.getBleDevice().getMacAddress().equals(ORIENT_BLE_ADDRESS)) {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(ctx, "Found " + scanResult.getBleDevice().getName(),
+                                            Toast.LENGTH_SHORT).show();
+                                });
                                 connectToOrient(ORIENT_BLE_ADDRESS);
                                 scanSubscription.dispose();
                             }
@@ -73,6 +124,13 @@ public class MainActivity extends Activity {
                         bytes -> {
                             // Given characteristic has been changes, here is the value.
                             Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
+                            if (!connected) {
+                                connected = true;
+                                runOnUiThread(() -> {
+                                                               Toast.makeText(ctx, "Receiving sensor data",
+                                                                       Toast.LENGTH_SHORT).show();
+                                                           });
+                            }
                             if (raw) handleRawPacket(bytes); else handleQuatPacket(bytes);
                         },
                         throwable -> {
@@ -122,5 +180,17 @@ public class MainActivity extends Activity {
         Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
         if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
+
+        if (logging) {
+            String[] entries = "first#second#third".split("#");
+            writer.writeNext(entries);
+            try {
+                writer.flush();
+            } catch (IOException e) {
+                Log.e("MainActivity", "Caught IOException: " + e.getMessage());
+            }
+        }
     }
+
+
 }
