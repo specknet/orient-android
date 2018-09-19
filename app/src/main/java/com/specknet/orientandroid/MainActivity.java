@@ -51,10 +51,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private RxBleClient rxBleClient;
     private ByteBuffer packetData;
 
-    private int n = 0;
+    //private int n = 0;
     private Long connected_timestamp = null;
     private Long capture_started_timestamp = null;
     boolean connected = false;
+    private float freq = 0.f;
 
     private int counter = 0;
     private CSVWriter writer;
@@ -68,6 +69,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private TextView captureTimetextView;
     private TextView accelTextView;
     private TextView gyroTextView;
+    private TextView freqTextView;
     private EditText nameEditText;
     private EditText notesEditText;
 
@@ -106,6 +108,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         captureTimetextView = findViewById(R.id.captureTimetextView);
         accelTextView = findViewById(R.id.accelTextView);
         gyroTextView = findViewById(R.id.gyroTextView);
+        freqTextView = findViewById(R.id.freqTextView);
         positionSpinner = findViewById(R.id.positionSpinner);
         groupSpinner = findViewById(R.id.groupSpinner);
         activitySpinner = findViewById(R.id.activitySpinner);
@@ -346,15 +349,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                 .flatMap(notificationObservable -> notificationObservable) // <-- Notification has been set up, now observe value changes.
                 .subscribe(
                         bytes -> {
-                            n += 1;
+                            //n += 1;
                             // Given characteristic has been changes, here is the value.
-
-                            if (n % 25 == 0) {
-                                Long elapsed_connection_time = System.currentTimeMillis() - connected_timestamp;
-                                float connected_secs = elapsed_connection_time / 1000.f;
-                                float freq = n / connected_secs;
-                                Log.i("OrientAndroid", "Packet count: " + Integer.toString(n) + ", Freq: " + Float.toString(freq));
-                            }
 
                             //Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
                             if (!connected) {
@@ -430,7 +426,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             };
             writer.writeNext(entries);
 
-            if (counter % 10 == 0) {
+            if (counter % 12 == 0) {
                 long elapsed_time = System.currentTimeMillis() - capture_started_timestamp;
                 int total_secs = (int)elapsed_time / 1000;
                 int s = total_secs % 60;
@@ -446,15 +442,23 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                     s_str = "0" + s_str;
                 }
 
+
+                Long elapsed_capture_time = System.currentTimeMillis() - capture_started_timestamp;
+                float connected_secs = elapsed_capture_time / 1000.f;
+                freq = counter / connected_secs;
+                //Log.i("OrientAndroid", "Packet count: " + Integer.toString(n) + ", Freq: " + Float.toString(freq));
+
                 String time_str = m_str + ":" + s_str;
 
                 String accel_str = "Accel: (" + accel_x + ", " + accel_y + ", " + accel_z + ")";
                 String gyro_str = "Gyro: (" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")";
+                String freq_str = "Freq: " + freq;
 
                 runOnUiThread(() -> {
                     captureTimetextView.setText(time_str);
                     accelTextView.setText(accel_str);
                     gyroTextView.setText(gyro_str);
+                    freqTextView.setText(freq_str);
                 });
             }
 
