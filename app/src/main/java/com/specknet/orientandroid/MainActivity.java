@@ -408,14 +408,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         float gyro_y = packetData.getShort() / 32.f;
         float gyro_z = packetData.getShort() / 32.f;
 
-        float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
-        float mag_y = packetData.getShort() / 16.f;
-        float mag_z = packetData.getShort() / 16.f;
+        //float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
+        //float mag_y = packetData.getShort() / 16.f;
+        //float mag_z = packetData.getShort() / 16.f;
 
         //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
         //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
-        if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
-            Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
+        //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
+            //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
         if (logging) {
             //String[] entries = "first#second#third".split("#");
