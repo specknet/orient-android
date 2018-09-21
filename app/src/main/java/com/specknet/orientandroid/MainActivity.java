@@ -172,6 +172,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                     Toast.LENGTH_SHORT).show();
         }
 
+        ORIENT_BLE_ADDRESS = "E3:0A:6F:3B:F2:62";
+
         start_button.setOnClickListener(v-> {
 
             if (group_str == null || act_type_str == null || position_str == null || (nameEditText.getText().toString().length() == 0)) {
