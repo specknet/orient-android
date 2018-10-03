@@ -26,4 +26,10 @@ android {
     }
 }
 
+Goal for Week 4
+---------------
+
+- Demonstrate your steptracking algorithm running in an Android app displaying a live step count on level ground.
+
+
 You will need to extend this app to provide step tracking and add a suitable user interface.
