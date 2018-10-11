@@ -217,7 +217,6 @@ public class MainActivity extends Activity {
                             //Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
                             if (!connected) {
                                 connected = true;
-                                connected_timestamp = System.currentTimeMillis();
                                 runOnUiThread(() -> {
                                     Toast.makeText(ctx, "Receiving sensor data",
                                             Toast.LENGTH_SHORT).show();
