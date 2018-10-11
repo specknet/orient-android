@@ -104,10 +104,10 @@ public class MainActivity extends Activity {
 
             String[] entries = null;
             if (raw) {
-                file = new File(path, "Orient_raw_" + "_" + file_ts + ".csv");
+                file = new File(path, "Orient_raw_" + file_ts + ".csv");
                 entries = "timestamp#seq#accel_x#accel_y#accel_z#gyro_x#gyro_y#gyro_z#mag_x#mag_y#mag_z".split("#");
             } else {
-                file = new File(path, "Orient_quat_" + "_" + file_ts + ".csv");
+                file = new File(path, "Orient_quat_" + file_ts + ".csv");
                 entries = "timestamp#seq#quat_w#quat_x#quat_y#quat_z".split("#");
             }
 
