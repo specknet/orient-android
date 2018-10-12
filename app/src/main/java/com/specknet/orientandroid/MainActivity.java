@@ -35,12 +35,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import fr.arnaudguyon.smartgl.math.Vector3D;
+import fr.arnaudguyon.smartgl.opengl.LightParallel;
+import fr.arnaudguyon.smartgl.opengl.Object3D;
+import fr.arnaudguyon.smartgl.opengl.RenderPassObject3D;
 import fr.arnaudguyon.smartgl.opengl.RenderPassSprite;
+import fr.arnaudguyon.smartgl.opengl.SmartColor;
 import fr.arnaudguyon.smartgl.opengl.SmartGLRenderer;
 import fr.arnaudguyon.smartgl.opengl.SmartGLView;
 import fr.arnaudguyon.smartgl.opengl.SmartGLViewController;
 import fr.arnaudguyon.smartgl.opengl.Sprite;
 import fr.arnaudguyon.smartgl.opengl.Texture;
+import fr.arnaudguyon.smartgl.tools.WavefrontModel;
 import fr.arnaudguyon.smartgl.touch.TouchHelperEvent;
 import io.reactivex.disposables.Disposable;
 
@@ -54,6 +60,11 @@ public class MainActivity extends Activity implements SmartGLViewController {
     private SmartGLView mSmartGLView;
     private Texture mSpriteTexture;
     private Sprite mSprite;
+    private Object3D mSpaceship;
+    private Object3D mCube;
+    private Texture mShipTexture;
+    private RenderPassObject3D mRenderPassObject3D;
+    private RenderPassObject3D mRenderPassObject3DColor;
 
     private boolean raw = true;
     private RxBleDevice orient_device;
@@ -215,16 +226,33 @@ public class MainActivity extends Activity implements SmartGLViewController {
     public void onPrepareView(SmartGLView smartGLView) {
         Context context = smartGLView.getContext();
         SmartGLRenderer renderer = smartGLView.getSmartGLRenderer();
-        RenderPassSprite renderPassSprite = new RenderPassSprite();
-        renderer.addRenderPass(renderPassSprite);  // add it only once for all Sprites
 
-        mSpriteTexture = new Texture(context, R.drawable.planet);
+        mRenderPassObject3D = new RenderPassObject3D(RenderPassObject3D.ShaderType.SHADER_TEXTURE_LIGHTS, true, true);
+        mRenderPassObject3DColor = new RenderPassObject3D(RenderPassObject3D.ShaderType.SHADER_COLOR, true, false);
 
-        mSprite = new Sprite(120, 120);	// 120 x 120 pixels
-        mSprite.setPivot(0.5f, 0.5f);  // set position / rotation axis to the middle of the sprite
-        mSprite.setPos(60, 60);
-        mSprite.setTexture(mSpriteTexture);
-        renderPassSprite.addSprite(mSprite);
+        mCube = loadCube(context);
+
+        mRenderPassObject3DColor.addObject(mCube);
+
+        renderer.addRenderPass(mRenderPassObject3D);  // add it only once for all 3D Objects
+        renderer.addRenderPass(mRenderPassObject3DColor);
+
+        renderer.setDoubleSided(false);
+
+        SmartColor lightColor = new SmartColor(1, 1, 1);
+        Vector3D lightDirection = new Vector3D(0, 1, 1);
+        lightDirection.normalize();
+        LightParallel lightParallel = new LightParallel(lightColor, lightDirection);
+        renderer.setLightParallel(lightParallel);
+
+    }
+
+    private Object3D loadCube(Context context) {
+        WavefrontModel modelColored = new WavefrontModel.Builder(context, R.raw.cube_color_obj)
+                .create();
+        Object3D object3D = modelColored.toObject3D();
+        object3D.setPos(0, 0, -4);
+        return object3D;
     }
 
     @Override
@@ -239,9 +267,12 @@ public class MainActivity extends Activity implements SmartGLViewController {
     public void onTick(SmartGLView smartGLView) {
         SmartGLRenderer renderer = smartGLView.getSmartGLRenderer();
         float frameDuration = renderer.getFrameDuration();
-        if (mSprite != null) {
-            float newRot = mSprite.getRotation() + (frameDuration * 100);
-            mSprite.setRotation(newRot);
+
+        if (mCube != null) {
+            float rx = mCube.getRotX() + 100 * frameDuration;
+            float ry = mCube.getRotY() + 77 * frameDuration;
+            float rz = mCube.getRotZ() + 56 * frameDuration;
+            mCube.setRotation(rx, ry, rz);
         }
     }
 
