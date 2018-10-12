@@ -35,14 +35,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import fr.arnaudguyon.smartgl.opengl.RenderPassSprite;
+import fr.arnaudguyon.smartgl.opengl.SmartGLRenderer;
+import fr.arnaudguyon.smartgl.opengl.SmartGLView;
+import fr.arnaudguyon.smartgl.opengl.SmartGLViewController;
+import fr.arnaudguyon.smartgl.opengl.Sprite;
+import fr.arnaudguyon.smartgl.opengl.Texture;
+import fr.arnaudguyon.smartgl.touch.TouchHelperEvent;
 import io.reactivex.disposables.Disposable;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SmartGLViewController {
 
     private static final String ORIENT_BLE_ADDRESS = "CB:D5:E1:DD:8F:0D"; // test device
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
+
+    private SmartGLView mSmartGLView;
+    private Texture mSpriteTexture;
+    private Sprite mSprite;
 
     private boolean raw = true;
     private RxBleDevice orient_device;
@@ -194,6 +205,48 @@ public class MainActivity extends Activity {
         packetData.order(ByteOrder.LITTLE_ENDIAN);
 
         rxBleClient = RxBleClient.create(this);
+
+        mSmartGLView = findViewById(R.id.smartGLView);
+        mSmartGLView.setDefaultRenderer(this);
+        mSmartGLView.setController(this);
+    }
+
+    @Override
+    public void onPrepareView(SmartGLView smartGLView) {
+        Context context = smartGLView.getContext();
+        SmartGLRenderer renderer = smartGLView.getSmartGLRenderer();
+        RenderPassSprite renderPassSprite = new RenderPassSprite();
+        renderer.addRenderPass(renderPassSprite);  // add it only once for all Sprites
+
+        mSpriteTexture = new Texture(context, R.drawable.planet);
+
+        mSprite = new Sprite(120, 120);	// 120 x 120 pixels
+        mSprite.setPivot(0.5f, 0.5f);  // set position / rotation axis to the middle of the sprite
+        mSprite.setPos(60, 60);
+        mSprite.setTexture(mSpriteTexture);
+        renderPassSprite.addSprite(mSprite);
+    }
+
+    @Override
+    public void onReleaseView(SmartGLView smartGLView) {
+    }
+
+    @Override
+    public void onResizeView(SmartGLView smartGLView) {
+    }
+
+    @Override
+    public void onTick(SmartGLView smartGLView) {
+        SmartGLRenderer renderer = smartGLView.getSmartGLRenderer();
+        float frameDuration = renderer.getFrameDuration();
+        if (mSprite != null) {
+            float newRot = mSprite.getRotation() + (frameDuration * 100);
+            mSprite.setRotation(newRot);
+        }
+    }
+
+    @Override
+    public void onTouchEvent(SmartGLView smartGLView, TouchHelperEvent event) {
     }
 
 
@@ -381,4 +434,19 @@ public class MainActivity extends Activity {
     }
 
 
+    @Override
+    protected void onPause() {
+        if (mSmartGLView != null) {
+            mSmartGLView.onPause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mSmartGLView != null) {
+            mSmartGLView.onResume();
+        }
+    }
 }

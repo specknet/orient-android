@@ -102,4 +102,10 @@
 
 
     </LinearLayout>
+
+    <fr.arnaudguyon.smartgl.opengl.SmartGLView
+        android:id="@+id/smartGLView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"/>/>
 </LinearLayout>
