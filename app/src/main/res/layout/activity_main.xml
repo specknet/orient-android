@@ -35,10 +35,16 @@
                     android:text="Quat" />
 
                 <RadioButton
-                    android:id="@+id/radioRight"
+                android:id="@+id/radioRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Raw" />
+
+                <RadioButton
+                    android:id="@+id/radioRawMD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Raw" />
+                    android:text="Raw Multiple Devices" />
 
             </RadioGroup>
     <Button

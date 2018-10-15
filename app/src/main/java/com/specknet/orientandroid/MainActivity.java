@@ -40,15 +40,25 @@ import io.reactivex.disposables.Disposable;
 public class MainActivity extends Activity {
 
     private static final String ORIENT_BLE_ADDRESS = "CB:D5:E1:DD:8F:0D"; // test device
+    public static final String ORIENT1_BLE_ADDRESS = "E1:66:70:34:89:72";
+    public static final String ORIENT2_BLE_ADDRESS = "E3:CF:82:7B:BF:77";
+
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
-    private boolean raw = true;
+    private boolean raw = false;
+    private boolean multi = false;
     private RxBleDevice orient_device;
+    private RxBleDevice orient1_device;
+    private RxBleDevice orient2_device;
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
     private ByteBuffer packetData;
+    private boolean foundO1 = false;
+    private boolean foundO2 = false;
+    private boolean receivingO1 = false;
+    private boolean receivingO2 = false;
 
     private Long capture_started_timestamp = null;
     boolean connected = false;
@@ -105,10 +115,10 @@ public class MainActivity extends Activity {
             String[] entries = null;
             if (raw) {
                 file = new File(path, "Orient_raw_" + file_ts + ".csv");
-                entries = "timestamp#seq#accel_x#accel_y#accel_z#gyro_x#gyro_y#gyro_z#mag_x#mag_y#mag_z".split("#");
+                entries = "device#timestamp#packet_seq#sample_seq#accel_x#accel_y#accel_z#gyro_x#gyro_y#gyro_z#mag_x#mag_y#mag_z".split("#");
             } else {
                 file = new File(path, "Orient_quat_" + file_ts + ".csv");
-                entries = "timestamp#seq#quat_w#quat_x#quat_y#quat_z".split("#");
+                entries = "device#timestamp#packet_seq#sample_seq#quat_w#quat_x#quat_y#quat_z".split("#");
             }
 
 
@@ -153,8 +163,10 @@ public class MainActivity extends Activity {
 
             if (characteristic_str.compareTo("Raw") == 0) {
                 raw = true;
-            } else {
-                raw = false;
+            }
+            else if (characteristic_str.compareTo("Raw Multiple Devices") == 0) {
+                raw = true;
+                multi = true;
             }
 
             scanSubscription = rxBleClient.scanBleDevices(
@@ -169,14 +181,44 @@ public class MainActivity extends Activity {
                                 Log.i("OrientAndroid", "FOUND: " + scanResult.getBleDevice().getName() + ", " +
                                         scanResult.getBleDevice().getMacAddress());
                                 // Process scan result here.
-                                if (scanResult.getBleDevice().getMacAddress().equals(ORIENT_BLE_ADDRESS)) {
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(ctx, "Found " + scanResult.getBleDevice().getName() + ", " +
-                                                        scanResult.getBleDevice().getMacAddress(),
-                                                Toast.LENGTH_SHORT).show();
-                                    });
-                                    connectToOrient(ORIENT_BLE_ADDRESS);
-                                    scanSubscription.dispose();
+                                if (!multi) {
+                                    if (scanResult.getBleDevice().getMacAddress().equals(ORIENT_BLE_ADDRESS)) {
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(ctx, "Found " + scanResult.getBleDevice().getName() + ", " +
+                                                            scanResult.getBleDevice().getMacAddress(),
+                                                    Toast.LENGTH_SHORT).show();
+                                        });
+                                        connectToOrient(ORIENT_BLE_ADDRESS, 0);
+                                        scanSubscription.dispose();
+                                    }
+                                }
+                                else {
+                                    if (!foundO1) {
+                                        if (scanResult.getBleDevice().getMacAddress().equals(ORIENT1_BLE_ADDRESS)) {
+                                            runOnUiThread(() -> {
+                                                Toast.makeText(ctx, "Found " + scanResult.getBleDevice().getName() + ", " +
+                                                                scanResult.getBleDevice().getMacAddress(),
+                                                        Toast.LENGTH_SHORT).show();
+                                            });
+                                            foundO1 = true;
+                                            connectToOrient(ORIENT1_BLE_ADDRESS, 1);
+                                        }
+                                    }
+                                    else if (!foundO2) {
+                                        if (scanResult.getBleDevice().getMacAddress().equals(ORIENT2_BLE_ADDRESS)) {
+                                            runOnUiThread(() -> {
+                                                Toast.makeText(ctx, "Found " + scanResult.getBleDevice().getName() + ", " +
+                                                                scanResult.getBleDevice().getMacAddress(),
+                                                        Toast.LENGTH_SHORT).show();
+                                            });
+                                            foundO2 = true;
+                                            connectToOrient(ORIENT2_BLE_ADDRESS, 2);
+
+
+                                        }
+                                    }
+                                    if (foundO1 && foundO2)
+                                        scanSubscription.dispose();
                                 }
                             },
                             throwable -> {
@@ -190,20 +232,24 @@ public class MainActivity extends Activity {
 
         });
 
-        packetData = ByteBuffer.allocate(18);
+        packetData = ByteBuffer.allocate(180);
         packetData.order(ByteOrder.LITTLE_ENDIAN);
 
         rxBleClient = RxBleClient.create(this);
     }
 
 
-    private void connectToOrient(String addr) {
-        orient_device = rxBleClient.getBleDevice(addr);
+    private void connectToOrient(String addr, int n) {
+        RxBleDevice dev;
+        dev = rxBleClient.getBleDevice(addr);
         String characteristic;
         if (raw) characteristic = ORIENT_RAW_CHARACTERISTIC;
         else characteristic = ORIENT_QUAT_CHARACTERISTIC;
 
-        orient_device.establishConnection(false)
+        boolean ac = false;
+        if (n ==2) ac = true;
+
+        dev.establishConnection(ac)
                 .flatMap(rxBleConnection -> rxBleConnection.setupNotification(UUID.fromString(characteristic)))
                 .doOnNext(notificationObservable -> {
                     // Notification has been set up
@@ -216,15 +262,32 @@ public class MainActivity extends Activity {
 
                             //Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
                             if (!connected) {
-                                connected = true;
                                 runOnUiThread(() -> {
-                                    Toast.makeText(ctx, "Receiving sensor data",
-                                            Toast.LENGTH_SHORT).show();
-                                    start_button.setEnabled(true);
+                                    //Toast.makeText(ctx, "Receiving sensor data from " + Integer.toString(n),
+                                    //        Toast.LENGTH_SHORT).show();
+                                    if (n == 0) {
+                                        connected = true;
+                                        start_button.setEnabled(true);
+                                    }
+                                    else if (n ==1)
+                                        receivingO1 = true;
+                                    else if (n ==2)
+                                        receivingO2 = true;
+                                    if (receivingO1 && receivingO2) {
+                                        connected = true;
+                                        start_button.setEnabled(true);
+                                    }
+
+
                                 });
                             }
-                            if (raw) handleRawPacket(bytes);
-                            else handleQuatPacket(bytes);
+                            if (multi) {
+                                handleMultiRawPacket(bytes, n);
+                            }
+                            else {
+                                if (raw) handleRawPacket(bytes);
+                                else handleQuatPacket(bytes);
+                            }
                         },
                         throwable -> {
                             // Handle an error here.
@@ -254,8 +317,10 @@ public class MainActivity extends Activity {
 
         if (logging) {
             //String[] entries = "first#second#third".split("#");
-            String[] entries = {Long.toString(ts),
+            String[] entries = {Integer.toString(0),
+                    Long.toString(ts),
                     Integer.toString(counter),
+                    Integer.toString(0),
                     Double.toString(dw),
                     Double.toString(dx),
                     Double.toString(dy),
@@ -326,8 +391,10 @@ public class MainActivity extends Activity {
 
         if (logging) {
             //String[] entries = "first#second#third".split("#");
-            String[] entries = {Long.toString(ts),
+            String[] entries = {Integer.toString(0),
+                    Long.toString(ts),
                     Integer.toString(counter),
+                    Integer.toString(0),
                     Float.toString(accel_x),
                     Float.toString(accel_y),
                     Float.toString(accel_z),
@@ -378,6 +445,90 @@ public class MainActivity extends Activity {
 
             counter += 1;
         }
+    }
+
+    private void handleMultiRawPacket(final byte[] bytes, int n) {
+        long ts = System.currentTimeMillis();
+        packetData.clear();
+        packetData.put(bytes);
+        packetData.position(0);
+
+        for (int i = 0; i < 10; i++) {
+
+            float accel_x = packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
+            float accel_y = packetData.getShort() / 1024.f;
+            float accel_z = packetData.getShort() / 1024.f;
+
+            float gyro_x = packetData.getShort() / 32.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
+            float gyro_y = packetData.getShort() / 32.f;
+            float gyro_z = packetData.getShort() / 32.f;
+
+            float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
+            float mag_y = packetData.getShort() / 16.f;
+            float mag_z = packetData.getShort() / 16.f;
+
+            //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
+            //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
+            //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
+            //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
+
+            if (logging) {
+                //String[] entries = "first#second#third".split("#");
+                String[] entries = {Integer.toString(n),
+                        Long.toString(ts),
+                        Integer.toString(counter),
+                        Integer.toString(i),
+                        Float.toString(accel_x),
+                        Float.toString(accel_y),
+                        Float.toString(accel_z),
+                        Float.toString(gyro_x),
+                        Float.toString(gyro_y),
+                        Float.toString(gyro_z),
+                        Float.toString(mag_x),
+                        Float.toString(mag_y),
+                        Float.toString(mag_z),
+                };
+                writer.writeNext(entries);
+
+                if (counter % 1 == 0) {
+                    long elapsed_time = System.currentTimeMillis() - capture_started_timestamp;
+                    int total_secs = (int) elapsed_time / 1000;
+                    int s = total_secs % 60;
+                    int m = total_secs / 60;
+
+                    String m_str = Integer.toString(m);
+                    if (m_str.length() < 2) {
+                        m_str = "0" + m_str;
+                    }
+
+                    String s_str = Integer.toString(s);
+                    if (s_str.length() < 2) {
+                        s_str = "0" + s_str;
+                    }
+
+
+                    Long elapsed_capture_time = System.currentTimeMillis() - capture_started_timestamp;
+                    float connected_secs = elapsed_capture_time / 1000.f;
+                    freq = counter / connected_secs;
+                    //Log.i("OrientAndroid", "Packet count: " + Integer.toString(n) + ", Freq: " + Float.toString(freq));
+
+                    String time_str = m_str + ":" + s_str;
+
+                    String accel_str = "Accel: (" + accel_x + ", " + accel_y + ", " + accel_z + ")";
+                    String gyro_str = "Gyro: (" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")";
+                    String freq_str = "Freq: " + freq;
+
+                    runOnUiThread(() -> {
+                        captureTimetextView.setText(time_str);
+                        accelTextView.setText(accel_str);
+                        gyroTextView.setText(gyro_str);
+                        freqTextView.setText(freq_str);
+                    });
+                }
+
+            }
+        }
+        counter += 1;
     }
 
 
