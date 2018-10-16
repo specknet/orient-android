@@ -98,13 +98,13 @@ public class MainActivity extends Activity implements SmartGLViewController {
     private RadioGroup characteristicRadioGroup;
     private String characteristic_str;
 
-    private double attitude;
-    private double heading;
-    private double bank;
-    private double q_w;
-    private double q_x;
-    private double q_y;
-    private double q_z;
+    private double attitude = 0.0;
+    private double heading = 0.0;
+    private double bank = 0.0;
+    private double q_w = 1.0;
+    private double q_x = 0.0;
+    private double q_y = 0.0;
+    private double q_z = 0.0;
 
 
     @Override
