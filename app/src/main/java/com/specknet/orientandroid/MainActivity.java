@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.math.*;
 
 import fr.arnaudguyon.smartgl.math.Vector3D;
 import fr.arnaudguyon.smartgl.opengl.LightParallel;
@@ -50,6 +49,9 @@ import fr.arnaudguyon.smartgl.opengl.Texture;
 import fr.arnaudguyon.smartgl.tools.WavefrontModel;
 import fr.arnaudguyon.smartgl.touch.TouchHelperEvent;
 import io.reactivex.disposables.Disposable;
+
+import static java.lang.Math.asin;
+import static java.lang.Math.atan2;
 
 public class MainActivity extends Activity implements SmartGLViewController {
 
@@ -95,6 +97,14 @@ public class MainActivity extends Activity implements SmartGLViewController {
 
     private RadioGroup characteristicRadioGroup;
     private String characteristic_str;
+
+    private double attitude;
+    private double heading;
+    private double bank;
+    private double q_w;
+    private double q_x;
+    private double q_y;
+    private double q_z;
 
 
     @Override
@@ -267,12 +277,14 @@ public class MainActivity extends Activity implements SmartGLViewController {
     @Override
     public void onTick(SmartGLView smartGLView) {
         SmartGLRenderer renderer = smartGLView.getSmartGLRenderer();
-        float frameDuration = renderer.getFrameDuration();
+        //float frameDuration = renderer.getFrameDuration();
 
         if (mCube != null) {
-            float rx = mCube.getRotX() + 100 * frameDuration;
-            float ry = mCube.getRotY() + 77 * frameDuration;
-            float rz = mCube.getRotZ() + 56 * frameDuration;
+            qtoa(q_w,q_x,q_y,q_z);
+
+            float rx = (float)attitude;
+            float ry = (float)heading;
+            float rz = (float)bank;
             mCube.setRotation(rx, ry, rz);
         }
     }
@@ -333,6 +345,11 @@ public class MainActivity extends Activity implements SmartGLViewController {
         double dx = x / 1073741824.0;
         double dy = y / 1073741824.0;
         double dz = z / 1073741824.0;
+
+        q_w = dw;
+        q_x = dx;
+        q_y = dy;
+        q_z = dz;
 
         //Log.i("OrientAndroid", "QuatInt: (w=" + w + ", x=" + x + ", y=" + y + ", z=" + z + ")");
         //Log.i("OrientAndroid", "QuatDbl: (w=" + dw + ", x=" + dx + ", y=" + dy + ", z=" + dz + ")");
@@ -482,27 +499,27 @@ public class MainActivity extends Activity implements SmartGLViewController {
         }
     }
 
-    public void set(Quat4d q1) {
-        double sqw = q1.w*q1.w;
-        double sqx = q1.x*q1.x;
-        double sqy = q1.y*q1.y;
-        double sqz = q1.z*q1.z;
+    public void qtoa(double w, double x, double y, double z) {
+        double sqw = w*w;
+        double sqx = x*x;
+        double sqy = y*y;
+        double sqz = z*z;
         double unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
-        double test = q1.x*q1.y + q1.z*q1.w;
+        double test = x*y + z*w;
         if (test > 0.499*unit) { // singularity at north pole
-            heading = 2 * atan2(q1.x,q1.w);
+            heading = 2 * atan2(x,w);
             attitude = Math.PI/2;
             bank = 0;
             return;
         }
         if (test < -0.499*unit) { // singularity at south pole
-            heading = -2 * atan2(q1.x,q1.w);
+            heading = -2 * atan2(x,w);
             attitude = -Math.PI/2;
             bank = 0;
             return;
         }
-        heading = atan2(2*q1.y*q1.w-2*q1.x*q1.z , sqx - sqy - sqz + sqw);
+        heading = atan2(2*y*w-2*x*z , sqx - sqy - sqz + sqw);
         attitude = asin(2*test/unit);
-        bank = atan2(2*q1.x*q1.w-2*q1.y*q1.z , -sqx + sqy - sqz + sqw)
+        bank = atan2(2*x*w-2*y*z , -sqx + sqy - sqz + sqw);
     }
 }
