@@ -282,9 +282,9 @@ public class MainActivity extends Activity implements SmartGLViewController {
         if (mCube != null) {
             qtoa(q_w,q_x,q_y,q_z);
 
-            float rx = (float)attitude;
-            float ry = (float)heading;
-            float rz = (float)bank;
+            float rx = (float)(attitude * 180.0 / 3.14159);
+            float ry = (float)(heading * 180.0 / 3.14159);
+            float rz = (float)(bank * 180.0 / 3.14159);
             mCube.setRotation(rx, ry, rz);
         }
     }
