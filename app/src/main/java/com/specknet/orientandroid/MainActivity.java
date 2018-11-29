@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -55,9 +56,10 @@ import static java.lang.Math.atan2;
 
 public class MainActivity extends Activity implements SmartGLViewController {
 
-    private static final String ORIENT_BLE_ADDRESS = "CB:D5:E1:DD:8F:0D"; // test device
+    private static final String ORIENT_BLE_ADDRESS = "E5:9B:79:A2:C3:D0"; // test device
 
-    private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
+    //private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
+    private static final String ORIENT_QUAT_CHARACTERISTIC = "00001527-1212-efde-1524-785feabcd123";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
     private SmartGLView mSmartGLView;
@@ -105,6 +107,10 @@ public class MainActivity extends Activity implements SmartGLViewController {
     private double q_x = 0.0;
     private double q_y = 0.0;
     private double q_z = 0.0;
+
+    private static float divisor_quat = (1 << 30);
+    private static String rotation;
+
 
 
     @Override
@@ -282,10 +288,18 @@ public class MainActivity extends Activity implements SmartGLViewController {
         if (mCube != null) {
             qtoa(q_w,q_x,q_y,q_z);
 
-            float rx = (float)(attitude * 180.0 / 3.14159);
-            float ry = (float)(heading * 180.0 / 3.14159);
-            float rz = (float)(bank * 180.0 / 3.14159);
+            float rz = (float)(bank * 180.0 / Math.PI);
+            //float rx = 0;
+            //float ry = 0;
+            //float rz = 0;
+            float ry = (float)(attitude * 180.0 / Math.PI);
+            float rx = (float)(heading * 180.0 / Math.PI);
+//            float rx = (float)(attitude * 180.0 / Math.PI);
+//            float ry = (float)(heading * 180.0 / Math.PI);
+//            float rz = (float)(bank * 180.0 / Math.PI);
             mCube.setRotation(rx, ry, rz);
+            rotation = String.format("pitch : %.2f, yaw: %.2f, roll: %.2f", rx, ry, rx);
+            //Log.e("MainActivity", rotation);
         }
     }
 
@@ -320,8 +334,7 @@ public class MainActivity extends Activity implements SmartGLViewController {
                                     start_button.setEnabled(true);
                                 });
                             }
-                            if (raw) handleRawPacket(bytes);
-                            else handleQuatPacket(bytes);
+                            handleQuatPacket(bytes);
                         },
                         throwable -> {
                             // Handle an error here.
@@ -331,156 +344,23 @@ public class MainActivity extends Activity implements SmartGLViewController {
     }
 
     private void handleQuatPacket(final byte[] bytes) {
-        long ts = System.currentTimeMillis();
-        packetData.clear();
-        packetData.put(bytes);
-        packetData.position(0);
 
-        int w = packetData.getInt();
-        int x = packetData.getInt();
-        int y = packetData.getInt();
-        int z = packetData.getInt();
-
-        double dw = w / 1073741824.0;  // 2^30
-        double dx = x / 1073741824.0;
-        double dy = y / 1073741824.0;
-        double dz = z / 1073741824.0;
-
-        q_w = dw;
-        q_x = dx;
-        q_y = dy;
-        q_z = dz;
-
-        //Log.i("OrientAndroid", "QuatInt: (w=" + w + ", x=" + x + ", y=" + y + ", z=" + z + ")");
-        //Log.i("OrientAndroid", "QuatDbl: (w=" + dw + ", x=" + dx + ", y=" + dy + ", z=" + dz + ")");
-
-        if (logging) {
-            //String[] entries = "first#second#third".split("#");
-            String[] entries = {Long.toString(ts),
-                    Integer.toString(counter),
-                    Double.toString(dw),
-                    Double.toString(dx),
-                    Double.toString(dy),
-                    Double.toString(dz),
-            };
-            writer.writeNext(entries);
-
-            if (counter % 12 == 0) {
-                long elapsed_time = System.currentTimeMillis() - capture_started_timestamp;
-                int total_secs = (int) elapsed_time / 1000;
-                int s = total_secs % 60;
-                int m = total_secs / 60;
-
-                String m_str = Integer.toString(m);
-                if (m_str.length() < 2) {
-                    m_str = "0" + m_str;
-                }
-
-                String s_str = Integer.toString(s);
-                if (s_str.length() < 2) {
-                    s_str = "0" + s_str;
-                }
+        float w = floatFromDataLittle(Arrays.copyOfRange(bytes, 4, 8)) / divisor_quat;
+        float x = floatFromDataLittle(Arrays.copyOfRange(bytes, 8, 12)) / divisor_quat;
+        float y = floatFromDataLittle(Arrays.copyOfRange(bytes, 12, 16)) / divisor_quat;
+        float z = floatFromDataLittle(Arrays.copyOfRange(bytes, 16, 20)) / divisor_quat;
 
 
-                Long elapsed_capture_time = System.currentTimeMillis() - capture_started_timestamp;
-                float connected_secs = elapsed_capture_time / 1000.f;
-                freq = counter / connected_secs;
-                //Log.i("OrientAndroid", "Packet count: " + Integer.toString(n) + ", Freq: " + Float.toString(freq));
+        q_w = w;
+        q_x = x;
+        q_y = y;
+        q_z = z;
 
-                String time_str = m_str + ":" + s_str;
 
-                String accel_str = "Quat: (" + dw + ", " + dx + ", " + dy + ", " + dz + ")";
-                String freq_str = "Freq: " + freq;
-
-                runOnUiThread(() -> {
-                    captureTimetextView.setText(time_str);
-                    accelTextView.setText(accel_str);
-                    freqTextView.setText(freq_str);
-                });
-            }
-
-            counter += 1;
-        }
+        counter += 1;
     }
 
-    private void handleRawPacket(final byte[] bytes) {
-        long ts = System.currentTimeMillis();
-        packetData.clear();
-        packetData.put(bytes);
-        packetData.position(0);
 
-        float accel_x = packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
-        float accel_y = packetData.getShort() / 1024.f;
-        float accel_z = packetData.getShort() / 1024.f;
-
-        float gyro_x = packetData.getShort() / 32.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
-        float gyro_y = packetData.getShort() / 32.f;
-        float gyro_z = packetData.getShort() / 32.f;
-
-        float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
-        float mag_y = packetData.getShort() / 16.f;
-        float mag_z = packetData.getShort() / 16.f;
-
-        //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
-        //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
-        //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
-        //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
-
-        if (logging) {
-            //String[] entries = "first#second#third".split("#");
-            String[] entries = {Long.toString(ts),
-                    Integer.toString(counter),
-                    Float.toString(accel_x),
-                    Float.toString(accel_y),
-                    Float.toString(accel_z),
-                    Float.toString(gyro_x),
-                    Float.toString(gyro_y),
-                    Float.toString(gyro_z),
-                    Float.toString(mag_x),
-                    Float.toString(mag_y),
-                    Float.toString(mag_z),
-            };
-            writer.writeNext(entries);
-
-            if (counter % 12 == 0) {
-                long elapsed_time = System.currentTimeMillis() - capture_started_timestamp;
-                int total_secs = (int) elapsed_time / 1000;
-                int s = total_secs % 60;
-                int m = total_secs / 60;
-
-                String m_str = Integer.toString(m);
-                if (m_str.length() < 2) {
-                    m_str = "0" + m_str;
-                }
-
-                String s_str = Integer.toString(s);
-                if (s_str.length() < 2) {
-                    s_str = "0" + s_str;
-                }
-
-
-                Long elapsed_capture_time = System.currentTimeMillis() - capture_started_timestamp;
-                float connected_secs = elapsed_capture_time / 1000.f;
-                freq = counter / connected_secs;
-                //Log.i("OrientAndroid", "Packet count: " + Integer.toString(n) + ", Freq: " + Float.toString(freq));
-
-                String time_str = m_str + ":" + s_str;
-
-                String accel_str = "Accel: (" + accel_x + ", " + accel_y + ", " + accel_z + ")";
-                String gyro_str = "Gyro: (" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")";
-                String freq_str = "Freq: " + freq;
-
-                runOnUiThread(() -> {
-                    captureTimetextView.setText(time_str);
-                    accelTextView.setText(accel_str);
-                    gyroTextView.setText(gyro_str);
-                    freqTextView.setText(freq_str);
-                });
-            }
-
-            counter += 1;
-        }
-    }
 
 
     @Override
@@ -499,27 +379,92 @@ public class MainActivity extends Activity implements SmartGLViewController {
         }
     }
 
+
     public void qtoa(double w, double x, double y, double z) {
-        double sqw = w*w;
-        double sqx = x*x;
-        double sqy = y*y;
-        double sqz = z*z;
-        double unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
-        double test = x*y + z*w;
-        if (test > 0.499*unit) { // singularity at north pole
-            heading = 2 * atan2(x,w);
+        double sqw = Math.pow(w, 2);
+        double sqx = Math.pow(x, 2);
+        double sqy = Math.pow(y, 2);
+        double sqz = Math.pow(z, 2);
+        double unit = sqx + sqy + sqz + sqw;
+        double test = x*y+z*w;
+        if (test > 0.499 * unit) {
+            heading = 2*atan2(x, w);
             attitude = Math.PI/2;
             bank = 0;
-            return;
-        }
-        if (test < -0.499*unit) { // singularity at south pole
-            heading = -2 * atan2(x,w);
+        } else if (test < -0.499*unit) {
+            heading = -2*atan2(x, w);
             attitude = -Math.PI/2;
             bank = 0;
-            return;
+        } else {
+            heading = atan2(2*y*w-2*x*z, sqx-sqy-sqz+sqw);
+            attitude = asin(2*test/unit);
+            bank = atan2(2*x*w-2*y*z, -sqx+sqy-sqz+sqw);
         }
-        heading = atan2(2*y*w-2*x*z , sqx - sqy - sqz + sqw);
-        attitude = asin(2*test/unit);
-        bank = atan2(2*x*w-2*y*z , -sqx + sqy - sqz + sqw);
+    }
+    public void qtoa3(double w, double x, double y, double z) {
+        double t0 = w*x+y*z;
+        double t1 = Math.pow(x, 2) + Math.pow(y, 2);
+        double t2 = w*y-z*x;
+        double t3 = w*z+x*y; // Test for gimbal lock
+        double t4 = Math.pow(y, 2)+Math.pow(z, 2);
+        bank = atan2(2*t0, 1-2*t1);
+        attitude = asin(2*t2);
+        heading = atan2(2*t3, 1-2*t4);
+
+//        if (attitude > (Math.PI/2 - 0.1)) {
+//            attitude = attitude - Math.PI;
+//        }
+
+//        if (Math.abs(attitude-(Math.PI/2)) < 0.1) {
+//            if (attitude > 0) {
+//                heading = 2*atan2(x,w);
+//                bank = 0;
+//                Log.e("MainActiviy", "+90");
+//            } else if (attitude < 0) {
+//                heading = -2*atan2(x,w);
+//                bank = 0;
+//                Log.e("MainActiviy", "-90");
+//
+//            }
+//        }
+        Log.e("MainActivity", String.format("Attitude: %.2f", attitude));
+        Log.e("MainActivity", String.format("Bank: %.2f", bank));
+        Log.e("MainActivity", String.format("Heading: %.2f", heading));
+
+//        if (t3 > 0.499) {// && t3 < 0.501) {
+//            heading = 2*atan2(x,w);
+//            bank = 0;
+//        } else if (t3 < -0.499) {//(t3 > -0.501 && t3 < -0.499) {
+//            heading = -2*atan2(x,w);
+//            bank = 0;
+//        }
+//
+//        heading = heading > Math.PI ? heading -  2*Math.PI : heading;
+//        attitude = attitude >  Math.PI ? attitude -  2*Math.PI : attitude;
+//        bank = bank >  Math.PI ? bank -  2*Math.PI : bank;
+    }
+
+    public void qtoa2(double w, double x, double y, double z) {
+        heading = atan2(2*(y*z+w*x), Math.pow(w, 2)-Math.pow(x, 2)-Math.pow(y, 2)+Math.pow(z, 2));
+        attitude = asin(-2*(x*z-w*y));
+        bank = atan2(2*(x*y+w*z), Math.pow(w, 2)+Math.pow(x, 2)-Math.pow(y, 2)-Math.pow(z, 2));
+        if (Math.abs(attitude-(Math.PI/2)) < 0.01) {
+            if (attitude > 0) {
+                heading = 2*atan2(x,w);
+                bank = 0;
+            } else if (attitude < 0) {
+                heading = -2*atan2(x,w);
+                bank = 0;
+            }
+        }
+
+        heading = heading > Math.PI ? heading -  2*Math.PI : heading;
+        attitude = attitude >  Math.PI ? attitude -  2*Math.PI : attitude;
+        bank = bank >  Math.PI ? bank -  2*Math.PI : bank;
+    }
+
+    private float floatFromDataLittle(byte[] bytes_slice) {
+        // Bytes to float (little endian)
+        return  java.nio.ByteBuffer.wrap(bytes_slice).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 }
