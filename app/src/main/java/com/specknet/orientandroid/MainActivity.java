@@ -56,10 +56,10 @@ import static java.lang.Math.atan2;
 
 public class MainActivity extends Activity implements SmartGLViewController {
 
-    private static final String ORIENT_BLE_ADDRESS = "E5:9B:79:A2:C3:D0"; // test device
+    private static final String ORIENT_BLE_ADDRESS = "CB:D5:E1:DD:8F:0D"; // test device
 
-    //private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
-    private static final String ORIENT_QUAT_CHARACTERISTIC = "00001527-1212-efde-1524-785feabcd123";
+    private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
+    //private static final String ORIENT_QUAT_CHARACTERISTIC = "00001527-1212-efde-1524-785feabcd123";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
     private SmartGLView mSmartGLView;
@@ -229,7 +229,7 @@ public class MainActivity extends Activity implements SmartGLViewController {
 
         });
 
-        packetData = ByteBuffer.allocate(18);
+        packetData = ByteBuffer.allocate(180);
         packetData.order(ByteOrder.LITTLE_ENDIAN);
 
         rxBleClient = RxBleClient.create(this);
@@ -345,16 +345,19 @@ public class MainActivity extends Activity implements SmartGLViewController {
 
     private void handleQuatPacket(final byte[] bytes) {
 
-        float w = floatFromDataLittle(Arrays.copyOfRange(bytes, 4, 8)) / divisor_quat;
-        float x = floatFromDataLittle(Arrays.copyOfRange(bytes, 8, 12)) / divisor_quat;
-        float y = floatFromDataLittle(Arrays.copyOfRange(bytes, 12, 16)) / divisor_quat;
-        float z = floatFromDataLittle(Arrays.copyOfRange(bytes, 16, 20)) / divisor_quat;
+        float w = floatFromDataLittle(Arrays.copyOfRange(bytes, 0, 4)) / divisor_quat;
+        float x = floatFromDataLittle(Arrays.copyOfRange(bytes, 4, 8)) / divisor_quat;
+        float y = floatFromDataLittle(Arrays.copyOfRange(bytes, 8, 12)) / divisor_quat;
+        float z = floatFromDataLittle(Arrays.copyOfRange(bytes, 12, 16)) / divisor_quat;
 
 
         q_w = w;
         q_x = x;
         q_y = y;
         q_z = z;
+
+        String q_str = "Quat: (" + w + ", " + x + ", " + y + ", " + z + ")";
+        Log.d("quat", q_str);
 
 
         counter += 1;
