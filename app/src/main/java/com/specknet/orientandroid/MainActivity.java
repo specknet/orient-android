@@ -266,6 +266,9 @@ public class MainActivity extends Activity implements SmartGLViewController {
         });
 
         toggleY = (ToggleButton) findViewById(R.id.toggleButtonY);
+        toggleY.setChecked(true);
+        negate_y = true;
+
         toggleY.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -278,6 +281,9 @@ public class MainActivity extends Activity implements SmartGLViewController {
         });
 
         toggleZ = (ToggleButton) findViewById(R.id.toggleButtonZ);
+        toggleZ.setChecked(true);
+        negate_z = true;
+
         toggleZ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
