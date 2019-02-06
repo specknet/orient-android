@@ -9,12 +9,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.opencsv.CSVWriter;
 import com.polidea.rxandroidble2.RxBleClient;
@@ -56,7 +58,7 @@ import static java.lang.Math.atan2;
 
 public class MainActivity extends Activity implements SmartGLViewController {
 
-    private static final String ORIENT_BLE_ADDRESS = "CB:D5:E1:DD:8F:0D"; // test device
+    private static final String ORIENT_BLE_ADDRESS = "D7:29:7E:13:28:11"; // test device
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     //private static final String ORIENT_QUAT_CHARACTERISTIC = "00001527-1212-efde-1524-785feabcd123";
@@ -95,6 +97,10 @@ public class MainActivity extends Activity implements SmartGLViewController {
     private TextView accelTextView;
     private TextView gyroTextView;
     private TextView freqTextView;
+    private ToggleButton toggleW;
+    private ToggleButton toggleX;
+    private ToggleButton toggleY;
+    private ToggleButton toggleZ;
 
 
     private RadioGroup characteristicRadioGroup;
@@ -110,6 +116,12 @@ public class MainActivity extends Activity implements SmartGLViewController {
 
     private static float divisor_quat = (1 << 30);
     private static String rotation;
+
+    private boolean negate_w = false;
+    private boolean negate_x = false;
+    private boolean negate_y = false;
+    private boolean negate_z = false;
+
 
 
 
@@ -227,6 +239,54 @@ public class MainActivity extends Activity implements SmartGLViewController {
                             }
                     );
 
+        });
+
+        toggleW = (ToggleButton) findViewById(R.id.toggleButtonW);
+        toggleW.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    negate_w = true;
+                } else {
+                    negate_w = false;
+                    // The toggle is disabled
+                }
+            }
+        });
+
+        toggleX = (ToggleButton) findViewById(R.id.toggleButtonX);
+        toggleX.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    negate_x = true;
+                } else {
+                    negate_x = false;
+                    // The toggle is disabled
+                }
+            }
+        });
+
+        toggleY = (ToggleButton) findViewById(R.id.toggleButtonY);
+        toggleY.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    negate_y = true;
+                } else {
+                    negate_y = false;
+                    // The toggle is disabled
+                }
+            }
+        });
+
+        toggleZ = (ToggleButton) findViewById(R.id.toggleButtonZ);
+        toggleZ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    negate_z = true;
+                } else {
+                    negate_z = false;
+                    // The toggle is disabled
+                }
+            }
         });
 
         packetData = ByteBuffer.allocate(180);
@@ -351,10 +411,12 @@ public class MainActivity extends Activity implements SmartGLViewController {
         float z = floatFromDataLittle(Arrays.copyOfRange(bytes, 12, 16)) / divisor_quat;
 
 
-        q_w = w;
-        q_x = x;
-        q_y = y;
-        q_z = z;
+        if (negate_w) q_w = -w; else q_w = w;
+        if (negate_x) q_x = -x; else q_x = x;
+        if (negate_y) q_y = -y; else q_y = y;
+        if (negate_z) q_z = -z; else q_z = z;
+
+        //Negating y and z seems to work
 
         String q_str = "Quat: (" + w + ", " + x + ", " + y + ", " + z + ")";
         Log.d("quat", q_str);
