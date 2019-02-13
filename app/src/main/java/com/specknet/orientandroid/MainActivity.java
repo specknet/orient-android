@@ -58,9 +58,9 @@ import static java.lang.Math.atan2;
 
 public class MainActivity extends Activity implements SmartGLViewController {
 
-    private static final String ORIENT_BLE_ADDRESS = "D7:29:7E:13:28:11"; // test device
+    private static final String ORIENT_BLE_ADDRESS = "FD:3C:AC:31:74:72"; // test device
 
-    private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
+    private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680403-9b35-4933-9b10-52ffa9740042";
     //private static final String ORIENT_QUAT_CHARACTERISTIC = "00001527-1212-efde-1524-785feabcd123";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
