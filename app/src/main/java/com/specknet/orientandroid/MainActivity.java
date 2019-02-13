@@ -60,7 +60,7 @@ public class MainActivity extends Activity implements SmartGLViewController {
 
     private static final String ORIENT_BLE_ADDRESS = "FD:3C:AC:31:74:72"; // test device
 
-    private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680403-9b35-4933-9b10-52ffa9740042";
+    private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     //private static final String ORIENT_QUAT_CHARACTERISTIC = "00001527-1212-efde-1524-785feabcd123";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
@@ -242,6 +242,9 @@ public class MainActivity extends Activity implements SmartGLViewController {
         });
 
         toggleW = (ToggleButton) findViewById(R.id.toggleButtonW);
+        toggleW.setChecked(true);
+        negate_w = true;
+
         toggleW.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -281,9 +284,6 @@ public class MainActivity extends Activity implements SmartGLViewController {
         });
 
         toggleZ = (ToggleButton) findViewById(R.id.toggleButtonZ);
-        toggleZ.setChecked(true);
-        negate_z = true;
-
         toggleZ.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
