@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +22,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -51,12 +54,12 @@ public class MainActivity extends AppCompatActivity {
     private ByteBuffer packetData;
 
     // For networking
-//    int port;
-//    DatagramSocket s;
-//    InetAddress local;
-//    int msg_length;
-//    byte[] message;
-//    DatagramPacket p;
+    int port;
+    DatagramSocket s;
+    InetAddress local;
+    int msg_length;
+    byte[] message;
+    DatagramPacket p;
     final String[] ip_name = new String[1];
     final String[] port_name = new String[1];
 
@@ -66,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        StrictMode.ThreadPolicy policy = new
+                StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -110,6 +118,14 @@ public class MainActivity extends AppCompatActivity {
     // Next three methods are for getting location permissions
 
     private void getLocationPermission() {
+        port = Integer.parseInt(port_name[0]);
+        try {
+            s = new DatagramSocket();
+            local = Inet4Address.getByName(ip_name[0]);
+        } catch (Exception e) {
+            Log.i("MainActivity", e.getMessage());
+        }
+
         int hasPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
         if (hasPermission != PackageManager.PERMISSION_GRANTED) {
             if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -159,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scanForOrient() {
+
         // Scan available devices and try to find the Orient
 
         rxBleClient = RxBleClient.create(this);
@@ -226,14 +243,14 @@ public class MainActivity extends AppCompatActivity {
 
         report = String.format("Quaternions: %.2f, %.2f, %.2f, %.2f", w, x, y, z);
 
-//        msg_length = report.length();
-//        message = report.getBytes();
-//        p = new DatagramPacket(message, msg_length, local, port);
-//        try {
-//            s.send(p);
-//        } catch (IOException e){
-//            Log.i("MainActivity", "Exception " + e.getMessage());
-//        }
+        msg_length = report.length();
+        message = report.getBytes();
+        p = new DatagramPacket(message, msg_length, local, port);
+        try {
+            s.send(p);
+        } catch (IOException e){
+            Log.i("MainActivity", "Exception " + e.getMessage());
+        }
 
         Log.i("MainActivity", report);
         runOnUiThread(new Runnable() {
