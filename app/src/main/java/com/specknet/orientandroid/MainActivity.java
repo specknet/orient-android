@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements SmartGLViewController {
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     //private static final String ORIENT_QUAT_CHARACTERISTIC = "00001527-1212-efde-1524-785feabcd123";
-    private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
+    private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
     private SmartGLView mSmartGLView;
     private Texture mSpriteTexture;
@@ -377,7 +377,8 @@ public class MainActivity extends Activity implements SmartGLViewController {
     private void connectToOrient(String addr) {
         orient_device = rxBleClient.getBleDevice(addr);
         String characteristic;
-        if (raw) characteristic = ORIENT_RAW_CHARACTERISTIC;
+        //
+        if (true) characteristic = ORIENT_RAW_CHARACTERISTIC;
         else characteristic = ORIENT_QUAT_CHARACTERISTIC;
 
         orient_device.establishConnection(false)
@@ -391,7 +392,7 @@ public class MainActivity extends Activity implements SmartGLViewController {
                             //n += 1;
                             // Given characteristic has been changes, here is the value.
 
-                            //Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
+                            Log.i("OrientAndroid", "Received " + bytes.length + " bytes");
                             if (!connected) {
                                 connected = true;
                                 runOnUiThread(() -> {
@@ -400,7 +401,7 @@ public class MainActivity extends Activity implements SmartGLViewController {
                                     start_button.setEnabled(true);
                                 });
                             }
-                            handleQuatPacket(bytes);
+                            //handleQuatPacket(bytes);
                         },
                         throwable -> {
                             // Handle an error here.
