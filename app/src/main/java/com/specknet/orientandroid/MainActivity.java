@@ -43,7 +43,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static String ORIENT_BLE_ADDRESS;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
-    private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
+    private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
     private static final boolean raw = true;
     private RxBleDevice orient_device;
