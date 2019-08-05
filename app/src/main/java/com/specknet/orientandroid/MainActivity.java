@@ -39,8 +39,10 @@ import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
-    //private static final String ORIENT_BLE_ADDRESS = "C7:BA:D7:9D:F8:2E"; // test device
-    private static String ORIENT_BLE_ADDRESS;
+    // test device - replace with the real BLE address of your sensor, which you can find
+    // by scanning for devices with the NRF Connect App
+
+    private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
@@ -159,18 +161,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, activity_list);
         adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         activitySpinner.setAdapter(adapter3);
-
-        try {
-            FileInputStream fis = new FileInputStream(path + "/" + "orient.ble");
-            BufferedReader bfr = new BufferedReader(new InputStreamReader(fis));
-            String ble_string = bfr.readLine();
-            ORIENT_BLE_ADDRESS = ble_string;
-        }
-        catch (IOException e) {
-            Log.e("MainActivity", "Error reading orient.ble file");
-            Toast.makeText(this,"Error reading orient.ble file",
-                    Toast.LENGTH_SHORT).show();
-        }
 
         start_button.setOnClickListener(v-> {
 
