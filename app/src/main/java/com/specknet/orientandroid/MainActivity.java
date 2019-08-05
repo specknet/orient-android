@@ -1,5 +1,6 @@
 package com.specknet.orientandroid;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.UUID;
 
 import io.reactivex.disposables.Disposable;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
@@ -95,7 +98,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private RadioGroup stepsRadioGroup;
     private RadioGroup mountingRadioGroup;
 
-
+    private final int RC_LOCATION_AND_STORAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +106,33 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         setContentView(R.layout.activity_main);
         ctx = this;
 
+        getPermissions();
+    }
+
+    @AfterPermissionGranted(RC_LOCATION_AND_STORAGE)
+    private void getPermissions() {
+        String[] perms = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            // Already have permission, do the thing
+            // ...
+            runApp();
+
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, getString(R.string.location_and_storage_rationale),
+                    RC_LOCATION_AND_STORAGE, perms);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    private void runApp() {
         path = Environment.getExternalStorageDirectory();
 
         start_button = findViewById(R.id.start_button);
@@ -134,8 +164,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         position_list.add("Upper Leg");
         position_list.add("Lower Leg");
         position_list.add("Foot");
-
-
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, position_list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -298,7 +326,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                             });
                         }
                 );
-
     }
 
     @Override
@@ -455,6 +482,4 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             counter += 1;
         }
     }
-
-
 }
