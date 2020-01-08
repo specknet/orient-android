@@ -265,7 +265,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                 String[] h11 = {""};
                 writer.writeNext(h11);
 
-                String[] entries = "timestamp#seq#accel_x#accel_y#accel_z#gyro_x#gyro_y#gyro_z".split("#");
+                String[] entries = "timestamp#seq#accel_x#accel_y#accel_z#gyro_x#gyro_y#gyro_z#mag_x#mag_y#mag_z".split("#");
                 writer.writeNext(entries);
 
                 logging = true;
@@ -421,9 +421,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         float gyro_y = packetData.getShort() / 32.f;
         float gyro_z = packetData.getShort() / 32.f;
 
-        //float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
-        //float mag_y = packetData.getShort() / 16.f;
-        //float mag_z = packetData.getShort() / 16.f;
+        float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
+        float mag_y = packetData.getShort() / 16.f;
+        float mag_z = packetData.getShort() / 16.f;
 
         //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
         //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
@@ -440,6 +440,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                     Float.toString(gyro_x),
                     Float.toString(gyro_y),
                     Float.toString(gyro_z),
+                    Float.toString(mag_x),
+                    Float.toString(mag_y),
+                    Float.toString(mag_z),
             };
             writer.writeNext(entries);
 
