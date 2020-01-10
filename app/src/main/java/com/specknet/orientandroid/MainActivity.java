@@ -54,13 +54,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
 
-    private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
+    private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
     private static final int UDP_PORT = 5001;
-    private static final String HOST_NAME = "192.168.1.1";
+    private static final String HOST_NAME = "192.168.137.1";
+    private static final boolean raw = false;
 
-    private static final boolean raw = true;
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
@@ -408,7 +408,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                         },
                         throwable -> {
                             // Handle an error here.
-                            Log.e("OrientAndroid", "Error: " + throwable.toString());
+                            throwable.printStackTrace();
+                            Log.e("OrientAndroid", "Error: " + throwable.getStackTrace());
                         }
                 );
     }
@@ -431,7 +432,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         Log.i("OrientAndroid", "QuatInt: (w=" + w + ", x=" + x + ", y=" + y + ", z=" + z + ")");
         Log.i("OrientAndroid", "QuatDbl: (w=" + dw + ", x=" + dx + ", y=" + dy + ", z=" + dz + ")");
 
-        String report = String.format("Quaternions: %.2f, %.2f, %.2f, %.2f", w, x, y, z);
+        String report = String.format("Quaternions: %.2f, %.2f, %.2f, %.2f", dw, dx, dy, dz);
 
         msg_length = report.length();
         message = report.getBytes();
