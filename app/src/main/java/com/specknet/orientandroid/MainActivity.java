@@ -28,6 +28,10 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
@@ -40,6 +44,9 @@ import io.reactivex.disposables.Disposable;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     // test device - replace with the real BLE address of your sensor, which you can find
@@ -50,11 +57,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static final String ORIENT_QUAT_CHARACTERISTIC = "00001526-1212-efde-1523-785feabcd125";
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
+    private static final int UDP_PORT = 5001;
+    private static final String HOST_NAME = "192.168.1.1";
+
     private static final boolean raw = true;
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
     private ByteBuffer packetData;
+
+    private int port;
+    private DatagramSocket s;
+    private InetAddress local;
+    private int msg_length;
+    private byte[] message;
+    private DatagramPacket p;
 
     //private int n = 0;
     private Long connected_timestamp = null;
@@ -291,6 +308,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             start_button.setEnabled(true);
         });
 
+        port = UDP_PORT;
+        try {
+            s = new DatagramSocket();
+            local = Inet4Address.getByName(HOST_NAME);
+        } catch (Exception e) {
+            Log.i("MainActivity", e.getMessage());
+        }
+
         packetData = ByteBuffer.allocate(18);
         packetData.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -405,6 +430,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         Log.i("OrientAndroid", "QuatInt: (w=" + w + ", x=" + x + ", y=" + y + ", z=" + z + ")");
         Log.i("OrientAndroid", "QuatDbl: (w=" + dw + ", x=" + dx + ", y=" + dy + ", z=" + dz + ")");
+
+        String report = String.format("Quaternions: %.2f, %.2f, %.2f, %.2f", w, x, y, z);
+
+        msg_length = report.length();
+        message = report.getBytes();
+        p = new DatagramPacket(message, msg_length, local, port);
+        try {
+            s.send(p);
+        } catch (IOException e){
+            Log.i("MainActivity", "Exception " + e.getMessage());
+        }
     }
 
     private void handleRawPacket(final byte[] bytes) {
