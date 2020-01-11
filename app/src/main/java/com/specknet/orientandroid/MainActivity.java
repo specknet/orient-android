@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kircherelectronics.fsensor.filter.gyroscope.OrientationGyroscope;
 import com.opencsv.CSVWriter;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -116,6 +117,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private RadioGroup mountingRadioGroup;
 
     private final int RC_LOCATION_AND_STORAGE = 1;
+
+    OrientationGyroscope orientationGyroscope;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
