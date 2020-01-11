@@ -17,11 +17,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kircherelectronics.fsensor.filter.gyroscope.OrientationGyroscope;
 import com.opencsv.CSVWriter;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
 import com.polidea.rxandroidble2.scan.ScanSettings;
+
+import org.apache.commons.math3.complex.Quaternion;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -60,7 +61,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     private static final int UDP_PORT = 5555;
     private static final String HOST_NAME = "192.168.137.1";
-    private static final boolean raw = false;
+    private static final boolean raw = true;
 
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
@@ -323,6 +324,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         packetData.order(ByteOrder.LITTLE_ENDIAN);
 
         orientationGyroscope = new OrientationGyroscope();
+        orientationGyroscope.setBaseOrientation(new Quaternion(0,0,0,1));
 
         rxBleClient = RxBleClient.create(this);
 
@@ -471,6 +473,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
         //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
+
+        float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x,gyro_y,gyro_z}, 1.0f/50.0f);
+
+        String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
+
+        msg_length = report.length();
+        message = report.getBytes();
+        p = new DatagramPacket(message, msg_length, local, port);
+        try {
+            s.send(p);
+        } catch (IOException e){
+            Log.i("MainActivity", "Exception " + e.getMessage());
+        }
 
         if (logging) {
             //String[] entries = "first#second#third".split("#");

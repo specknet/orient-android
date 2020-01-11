@@ -95,7 +95,7 @@ public class OrientationGyroscope extends BaseFilter {
      * Initialize a singleton instance.
      */
     public OrientationGyroscope() {
-        output = new float[3];
+        output = new float[4];
     }
 
     @Override
@@ -109,21 +109,25 @@ public class OrientationGyroscope extends BaseFilter {
      * @param timestamp the gyroscope timestamp
      * @return An orientation vector -> @link SensorManager#getOrientation(float[], float[])}
      */
-    public float[] calculateOrientation(float[] gyroscope, long timestamp) {
+    public float[] calculateOrientation(float[] gyroscope, float dT) {
         if (isBaseOrientationSet()) {
 
             if (this.timestamp != 0) {
-                final float dT = (timestamp - this.timestamp) * NS2S;
+                //final float dT = (timestamp - this.timestamp) * NS2S;
                 rotationVectorGyroscope = RotationUtil.integrateGyroscopeRotation(rotationVectorGyroscope, gyroscope, dT, EPSILON);
 
                 Rotation rotation = new Rotation(rotationVectorGyroscope.getQ0(), rotationVectorGyroscope.getQ1(), rotationVectorGyroscope.getQ2(),
                         rotationVectorGyroscope.getQ3(), true);
 
+                /*
                 try {
                     output = doubleToFloat(rotation.getAngles(RotationOrder.XYZ, RotationConvention.VECTOR_OPERATOR));
                 } catch(Exception e) {
                     Log.d(TAG, "", e);
                 }
+                */
+
+                output = doubleToFloat(new double[]{rotation.getQ0(),rotation.getQ1(),rotation.getQ2(),rotation.getQ3()});
             }
 
             this.timestamp = timestamp;
