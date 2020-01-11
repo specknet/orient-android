@@ -118,7 +118,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     private final int RC_LOCATION_AND_STORAGE = 1;
 
-    OrientationGyroscope orientationGyroscope;
+    private OrientationGyroscope orientationGyroscope;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -321,6 +321,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         packetData = ByteBuffer.allocate(18);
         packetData.order(ByteOrder.LITTLE_ENDIAN);
+
+        orientationGyroscope = new OrientationGyroscope();
 
         rxBleClient = RxBleClient.create(this);
 
