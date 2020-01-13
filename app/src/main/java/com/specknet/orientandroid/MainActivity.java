@@ -60,7 +60,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
     private static final int UDP_PORT = 5555;
-    private static final String HOST_NAME = "192.168.137.1";
+    private static final String HOST_NAME = "192.168.43.113";
     private static final boolean raw = true;
 
     private RxBleDevice orient_device;
@@ -470,13 +470,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         float mag_z = packetData.getShort() / 16.f;
 
         //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
-        //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
+        Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
         //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
-        float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x,gyro_y,gyro_z}, 1.0f/50.0f);
+        float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
 
         String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
+
+        Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
 
         msg_length = report.length();
         message = report.getBytes();

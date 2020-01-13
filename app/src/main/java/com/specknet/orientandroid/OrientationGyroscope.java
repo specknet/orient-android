@@ -112,7 +112,7 @@ public class OrientationGyroscope extends BaseFilter {
     public float[] calculateOrientation(float[] gyroscope, float dT) {
         if (isBaseOrientationSet()) {
 
-            if (this.timestamp != 0) {
+            if (this.timestamp != 0 || true) {
                 //final float dT = (timestamp - this.timestamp) * NS2S;
                 rotationVectorGyroscope = RotationUtil.integrateGyroscopeRotation(rotationVectorGyroscope, gyroscope, dT, EPSILON);
 
