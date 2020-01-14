@@ -123,6 +123,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     private OrientationGyroscope orientationGyroscope;
     private OrientationFusedComplementary orientationFusion;
+    private OrientationFusedKalman orientationKalman;
 
     private float[] latest_mag;
 
@@ -334,6 +335,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         orientationFusion = new OrientationFusedComplementary();
         orientationFusion.setBaseOrientation(new Quaternion(0,0,0,1));
 
+        orientationKalman = new OrientationFusedKalman();
+        orientationKalman.setBaseOrientation(new Quaternion(0,0,0,1));
+        orientationKalman.startFusion();
+
         latest_mag = null;
 
         rxBleClient = RxBleClient.create(this);
@@ -484,6 +489,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
+        Vector3f va = new Vector3f(accel_x, accel_y, accel_z);
+        va.normalize();
+        accel_x = va.getX();
+        accel_y = va.getY();
+        accel_z = va.getZ();
+
+
         if (mag_x != 0.f || mag_y != 0.f || mag_z != 0.f)
         {
             Vector3f v = new Vector3f(mag_x, mag_y, mag_z);
@@ -494,7 +506,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         if (latest_mag != null) {
             //float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
             float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
-            //float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x, gyro_y, gyro_z}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
+            //float[] q = orientationKalman.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
 
             String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
