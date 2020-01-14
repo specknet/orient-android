@@ -49,6 +49,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import javax.vecmath.Vector3f;
+
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     // test device - replace with the real BLE address of your sensor, which you can find
@@ -60,7 +62,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
     private static final int UDP_PORT = 5555;
-    private static final String HOST_NAME = "192.168.43.113";
+    private static final String HOST_NAME = "192.168.137.1";
     private static final boolean raw = true;
 
     private RxBleDevice orient_device;
@@ -484,23 +486,29 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         if (mag_x != 0.f || mag_y != 0.f || mag_z != 0.f)
         {
-            latest_mag = new float[]{mag_x, mag_y ,mag_z};
+            Vector3f v = new Vector3f(mag_x, mag_y, mag_z);
+            v.normalize();
+            latest_mag = new float[]{v.getX(), v.getY() ,v.getZ()};
         }
 
-        //float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
-        float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f, new float[]{accel_x,accel_y,accel_z}, latest_mag);
+        if (latest_mag != null) {
+            //float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
+            float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
+            //float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x, gyro_y, gyro_z}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
-        String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
 
-        Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
+            String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
 
-        msg_length = report.length();
-        message = report.getBytes();
-        p = new DatagramPacket(message, msg_length, local, port);
-        try {
-            s.send(p);
-        } catch (IOException e){
-            Log.i("MainActivity", "Exception " + e.getMessage());
+            Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
+
+            msg_length = report.length();
+            message = report.getBytes();
+            p = new DatagramPacket(message, msg_length, local, port);
+            try {
+                s.send(p);
+            } catch (IOException e) {
+                Log.i("MainActivity", "Exception " + e.getMessage());
+            }
         }
 
         if (logging) {

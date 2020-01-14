@@ -32,6 +32,7 @@ dependencies {
     implementation 'com.github.KalebKE:FSensor:v1.2.1'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.x.x'
+    implementation 'javax.vecmath:vecmath:1.5.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
