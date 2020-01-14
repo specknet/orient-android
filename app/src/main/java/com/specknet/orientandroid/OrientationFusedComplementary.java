@@ -2,7 +2,7 @@ package com.specknet.orientandroid;
 
 import android.util.Log;
 
-import com.kircherelectronics.fsensor.filter.gyroscope.fusion.OrientationFused;
+//import com.specknet.orientandroid.OrientationFused;
 import com.kircherelectronics.fsensor.util.rotation.RotationUtil;
 
 import org.apache.commons.math3.complex.Quaternion;
@@ -103,10 +103,10 @@ public class OrientationFusedComplementary extends OrientationFused {
      * @param magnetic the magnetic measurements
      * @return the fused orientation estimation.
      */
-    public float[] calculateFusedOrientation(float[] gyroscope, long timestamp, float[] acceleration, float[] magnetic) {
+    public float[] calculateFusedOrientation(float[] gyroscope, float dT, float[] acceleration, float[] magnetic) {
         if (isBaseOrientationSet()) {
-            if (this.timestamp != 0) {
-                final float dT = (timestamp - this.timestamp) * NS2S;
+            if (this.timestamp != 0 || true) {
+                //final float dT = (timestamp - this.timestamp) * NS2S;
 
                 float alpha = timeConstant / (timeConstant + dT);
                 float oneMinusAlpha = (1.0f - alpha);
@@ -133,11 +133,13 @@ public class OrientationFusedComplementary extends OrientationFused {
                 Rotation rotation = new Rotation(rotationVectorGyroscope.getQ0(), rotationVectorGyroscope.getQ1(), rotationVectorGyroscope.getQ2(),
                         rotationVectorGyroscope.getQ3(), true);
 
-                try {
+                /* try {
                     output = doubleToFloat(rotation.getAngles(RotationOrder.XYZ, RotationConvention.VECTOR_OPERATOR));
                 } catch(Exception e) {
                     Log.d(TAG, "", e);
-                }
+                } */
+
+                output = doubleToFloat(new double[]{rotation.getQ0(),rotation.getQ1(),rotation.getQ2(),rotation.getQ3()});
             }
 
             this.timestamp = timestamp;
