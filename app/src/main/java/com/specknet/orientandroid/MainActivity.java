@@ -120,6 +120,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private final int RC_LOCATION_AND_STORAGE = 1;
 
     private OrientationGyroscope orientationGyroscope;
+    private OrientationFusedComplementary orientationFusion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -325,6 +326,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         orientationGyroscope = new OrientationGyroscope();
         orientationGyroscope.setBaseOrientation(new Quaternion(0,0,0,1));
+
+        orientationFusion = new OrientationFusedComplementary();
+        orientationFusion.setBaseOrientation(new Quaternion(0,0,0,1));
 
         rxBleClient = RxBleClient.create(this);
 
