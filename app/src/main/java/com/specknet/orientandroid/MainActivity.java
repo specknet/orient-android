@@ -122,6 +122,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private OrientationGyroscope orientationGyroscope;
     private OrientationFusedComplementary orientationFusion;
 
+    private float[] latest_mag;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -330,6 +332,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         orientationFusion = new OrientationFusedComplementary();
         orientationFusion.setBaseOrientation(new Quaternion(0,0,0,1));
 
+        latest_mag = null;
+
         rxBleClient = RxBleClient.create(this);
 
         scanSubscription = rxBleClient.scanBleDevices(
@@ -478,7 +482,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
-        float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
+        if (mag_x != 0.f || mag_y != 0.f || mag_z != 0.f)
+        {
+            latest_mag = new float[]{mag_x, mag_y ,mag_z};
+        }
+
+        //float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
+        float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f, new float[]{accel_x,accel_y,accel_z}, latest_mag);
 
         String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
 
