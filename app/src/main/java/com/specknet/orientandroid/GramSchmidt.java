@@ -13,6 +13,6 @@ public class GramSchmidt {
         x = x.scalarMultiply(1.0 / x.getNorm());
         Vector3D y = z.crossProduct(x);
 
-        return Quaternion.fromVectors(x, y, z);
+        return new QuatFromVectors(x, y, z).getQuat();
     }
 }
