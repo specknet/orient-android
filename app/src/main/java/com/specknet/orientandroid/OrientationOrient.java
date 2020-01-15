@@ -18,11 +18,13 @@ public class OrientationOrient extends BaseFilter {
     private Quaternion rotationVectorImusim;
     private float[] output;
     private long timestamp = 0;
+    private OrientCF orientCF;
 
     /**
      * Initialize a singleton instance.
      */
     public OrientationOrient() {
+        orientCF = null;
         output = new float[4];
     }
 
@@ -42,7 +44,7 @@ public class OrientationOrient extends BaseFilter {
 
             if (this.timestamp != 0 || true) {
                 //final float dT = (timestamp - this.timestamp) * NS2S;
-                rotationVectorImusim = null;
+                rotationVectorImusim = orientCF.update(acceleration, magnetic, gyroscope, dT, 10.0f, 0.5f);
 
                 Rotation rotation = new Rotation(rotationVectorImusim.getQ0(), rotationVectorImusim.getQ1(), rotationVectorImusim.getQ2(),
                         rotationVectorImusim.getQ3(), true);
@@ -77,16 +79,16 @@ public class OrientationOrient extends BaseFilter {
      * @param baseOrientation The base orientation to which all subsequent rotations will be applied.
      */
     public void setBaseOrientation(Quaternion baseOrientation) {
-        rotationVectorGyroscope = baseOrientation;
+        orientCF = new OrientCF(baseOrientation, 1.0f, 1.0f);
     }
 
     public void reset() {
-        rotationVectorGyroscope = null;
+        rotationVectorImusim = null;
         timestamp = 0;
     }
 
     public boolean isBaseOrientationSet() {
-        return rotationVectorGyroscope != null;
+        return rotationVectorImusim != null;
     }
 
     private static float[] doubleToFloat(double[] values) {

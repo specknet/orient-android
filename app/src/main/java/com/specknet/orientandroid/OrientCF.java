@@ -52,12 +52,14 @@ package com.specknet.orientandroid;
 */
 
 import org.apache.commons.math3.complex.Quaternion;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3DFormat;
 
 public class OrientCF {
     private float _k;
     private float _aT;
     private Quaternion qHat;
-    private GramSchmidt _vectorObervation;
+    private GramSchmidt _vectorObservation;
 
     OrientCF(Quaternion initialRotation, float k, float aT) {
         this._k = k;
@@ -67,6 +69,35 @@ public class OrientCF {
     }
 
     Quaternion update(float[] accel, float[] mag, float[] gyro, float dt, float k, float aT) {
-        Quaternion dotq = 0.5 * this.qHat * Quaternion(0,*gyro);
+        Quaternion dotq = this.qHat.multiply(new Quaternion(0.0, floatToDouble(gyro))).multiply(0.5);
+        this.qHat.add(dotq.multiply(dt));
+        this._aT = aT;
+        this._k = k;
+
+        Vector3D accel_v3d = new Vector3D(floatToDouble(accel));
+        Vector3D mag_v3d = new Vector3D(floatToDouble(mag));
+
+        if (Math.abs(accel_v3d.getNorm() - 1) < this._aT) {
+            Quaternion qMeas = this._vectorObservation.process(accel_v3d.negate(), mag_v3d);
+            if (this.qHat.dotProduct(qMeas) < 0.0) {
+                qMeas.multiply(-1.0);
+                Quaternion qError = qMeas.subtract(qHat);
+                this.qHat = this.qHat.add(qError.multiply((1.0 / this._k) * dt));
+            }
+        }
+        this.qHat.normalize();
+        return this.qHat;
+    }
+
+    private static double[] floatToDouble(float[] values) {
+        double[] d = new double[values.length];
+
+        for(int i = 0; i < d.length; i++){
+            d[i] = (double) values[i];
+        }
+
+        return d;
     }
 }
+
+
