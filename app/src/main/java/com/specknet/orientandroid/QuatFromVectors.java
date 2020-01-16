@@ -74,5 +74,8 @@ public class QuatFromVectors {
                 }
             }
         }
+
+        //update quaternion with new components
+        this.q = new Quaternion(this.w, this.x, this.y, this.z);
     }
 }
