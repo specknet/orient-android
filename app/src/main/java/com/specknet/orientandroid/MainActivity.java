@@ -61,7 +61,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
-    private static final int UDP_PORT = 5555;
+    private static final int UDP_PORT = 5556;
     private static final String HOST_NAME = "192.168.137.1";
     private static final boolean raw = true;
 
@@ -494,7 +494,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
         Vector3f va = new Vector3f(accel_x, accel_y, accel_z);
-        va.normalize();
+        //va.normalize();
         accel_x = va.getX();
         accel_y = va.getY();
         accel_z = va.getZ();
@@ -503,7 +503,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         if (mag_x != 0.f || mag_y != 0.f || mag_z != 0.f)
         {
             Vector3f v = new Vector3f(mag_x, mag_y, mag_z);
-            v.normalize();
+            //v.normalize();
             latest_mag = new float[]{v.getX(), v.getY() ,v.getZ()};
         }
 
@@ -515,10 +515,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
             String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
 
+            String report2 = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", gyro_x, gyro_x, gyro_x, accel_x, accel_y, accel_z, latest_mag[0], latest_mag[1], latest_mag[2]);
+
             Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
 
-            msg_length = report.length();
-            message = report.getBytes();
+            msg_length = report2.length();
+            message = report2.getBytes();
             p = new DatagramPacket(message, msg_length, local, port);
             try {
                 s.send(p);
