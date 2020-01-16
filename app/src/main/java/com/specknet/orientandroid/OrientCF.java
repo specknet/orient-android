@@ -69,18 +69,18 @@ public class OrientCF {
     }
 
     Quaternion update(float[] accel, float[] mag, float[] gyro, float dt, float k, float aT) {
-        Vector3D accel_v3d = new Vector3D(floatToDouble(accel));    
+        Vector3D accel_v3d = new Vector3D(floatToDouble(accel));
         Vector3D mag_v3d = new Vector3D(floatToDouble(mag));
         Vector3D gyro_v3d = new Vector3D(floatToDouble(gyro));
 
         Quaternion dotq = this.qHat.multiply(new Quaternion(0.0, gyro_v3d.getX(), gyro_v3d.getY(), gyro_v3d.getZ())).multiply(0.5);
-        this.qHat.add(dotq.multiply(dt));
+        this.qHat = this.qHat.add(dotq.multiply(dt));
         this._aT = aT;
         this._k = k;
 
-        return this.qHat;
+        //return this.qHat;
 
-/*
+
         if (Math.abs(accel_v3d.getNorm() - 1) < this._aT) {
             Quaternion qMeas = this._vectorObservation.process(accel_v3d.negate(), mag_v3d);
             if (this.qHat.dotProduct(qMeas) < 0.0) {
@@ -91,7 +91,6 @@ public class OrientCF {
         }
         this.qHat.normalize();
         return this.qHat;
-*/
 
     }
 
