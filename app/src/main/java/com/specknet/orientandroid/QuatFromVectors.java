@@ -58,7 +58,7 @@ public class QuatFromVectors {
             else {
                 double t3 = m.getEntry(1, 1) - m.getEntry(0, 0) - m.getEntry(2, 2);
                 if (t3 > 0) {
-                    double y2 = sqrt(t + 1);
+                    double y2 = sqrt(t3 + 1);
                     this.w = (m.getEntry(0, 2) - m.getEntry(2, 0)) / (2.0 * y2);
                     this.x = (m.getEntry(1, 0) + m.getEntry(0, 1)) / (2.0 * y2);
                     this.y = y2 / 2.0;
