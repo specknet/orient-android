@@ -46,8 +46,8 @@ public class OrientationOrient extends BaseFilter {
                 //final float dT = (timestamp - this.timestamp) * NS2S;
                 rotationVectorImusim = orientCF.update(acceleration, magnetic, gyroscope, dT, 10.0f, 0.5f);
 
-                Rotation rotation = new Rotation(rotationVectorImusim.getQ0(), rotationVectorImusim.getQ1(), rotationVectorImusim.getQ2(),
-                        rotationVectorImusim.getQ3(), true);
+                //Rotation rotation = new Rotation(rotationVectorImusim.getQ0(), rotationVectorImusim.getQ1(), rotationVectorImusim.getQ2(),
+                        //rotationVectorImusim.getQ3(), true);
 
                 /*
                 try {
@@ -57,7 +57,7 @@ public class OrientationOrient extends BaseFilter {
                 }
                 */
 
-                output = doubleToFloat(new double[]{rotation.getQ0(),rotation.getQ1(),rotation.getQ2(),rotation.getQ3()});
+                output = doubleToFloat(new double[]{rotationVectorImusim.getQ0(),rotationVectorImusim.getQ1(),rotationVectorImusim.getQ2(),rotationVectorImusim.getQ3()});
             }
 
             this.timestamp = timestamp;

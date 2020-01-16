@@ -61,7 +61,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
-    private static final int UDP_PORT = 5556;
+    private static final int UDP_PORT = 5555;
+    private static final int UDP_PORT2 = 5556;
     private static final String HOST_NAME = "192.168.137.1";
     private static final boolean raw = true;
 
@@ -71,11 +72,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private ByteBuffer packetData;
 
     private int port;
+    private int port2;
     private DatagramSocket s;
     private InetAddress local;
+    private DatagramSocket s2;
+    private InetAddress local2;
     private int msg_length;
     private byte[] message;
     private DatagramPacket p;
+    private DatagramPacket p2;
 
     //private int n = 0;
     private Long connected_timestamp = null;
@@ -320,9 +325,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         });
 
         port = UDP_PORT;
+        port2 = UDP_PORT2;
         try {
             s = new DatagramSocket();
             local = Inet4Address.getByName(HOST_NAME);
+        } catch (Exception e) {
+            Log.i("MainActivity", e.getMessage());
+        }
+        try {
+            s2 = new DatagramSocket();
+            local2 = Inet4Address.getByName(HOST_NAME);
         } catch (Exception e) {
             Log.i("MainActivity", e.getMessage());
         }
@@ -511,19 +523,28 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             //float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
             //float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
             //float[] q = orientationKalman.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
-            float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x, gyro_y, gyro_z}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
+            float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
             String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
 
-            String report2 = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", gyro_x, gyro_x, gyro_x, accel_x, accel_y, accel_z, latest_mag[0], latest_mag[1], latest_mag[2]);
+            String report2 = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
 
             Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
 
-            msg_length = report2.length();
-            message = report2.getBytes();
+            msg_length = report.length();
+            message = report.getBytes();
             p = new DatagramPacket(message, msg_length, local, port);
             try {
                 s.send(p);
+            } catch (IOException e) {
+                Log.i("MainActivity", "Exception " + e.getMessage());
+            }
+
+            msg_length = report2.length();
+            message = report2.getBytes();
+            p2 = new DatagramPacket(message, msg_length, local, port2);
+            try {
+                s2.send(p2);
             } catch (IOException e) {
                 Log.i("MainActivity", "Exception " + e.getMessage());
             }

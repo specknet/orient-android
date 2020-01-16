@@ -74,6 +74,9 @@ public class OrientCF {
         this._aT = aT;
         this._k = k;
 
+        return this.qHat;
+
+        /*
         Vector3D accel_v3d = new Vector3D(floatToDouble(accel));
         Vector3D mag_v3d = new Vector3D(floatToDouble(mag));
 
@@ -87,6 +90,8 @@ public class OrientCF {
         }
         this.qHat.normalize();
         return this.qHat;
+        */
+
     }
 
     private static double[] floatToDouble(float[] values) {
