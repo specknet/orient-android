@@ -511,7 +511,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             //float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
             //float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
             //float[] q = orientationKalman.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
-            float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
+            float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x, gyro_y, gyro_z}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
             String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
 
