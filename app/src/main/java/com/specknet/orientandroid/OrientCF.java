@@ -76,7 +76,7 @@ public class OrientCF {
 
         return this.qHat;
 
-        /*
+/*
         Vector3D accel_v3d = new Vector3D(floatToDouble(accel));
         Vector3D mag_v3d = new Vector3D(floatToDouble(mag));
 
@@ -90,7 +90,7 @@ public class OrientCF {
         }
         this.qHat.normalize();
         return this.qHat;
-        */
+*/
 
     }
 
