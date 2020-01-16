@@ -531,14 +531,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
             Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
 
-            msg_length = report.length();
+
+            /*msg_length = report.length();
             message = report.getBytes();
             p = new DatagramPacket(message, msg_length, local, port);
             try {
                 s.send(p);
             } catch (IOException e) {
                 Log.i("MainActivity", "Exception " + e.getMessage());
-            }
+            }*/
+
 
             msg_length = report2.length();
             message = report2.getBytes();
@@ -548,6 +550,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             } catch (IOException e) {
                 Log.i("MainActivity", "Exception " + e.getMessage());
             }
+
         }
 
         if (logging) {
