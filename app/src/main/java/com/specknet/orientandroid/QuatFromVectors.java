@@ -19,13 +19,12 @@ public class QuatFromVectors {
     double z;
 
     QuatFromVectors(Vector3D v1, Vector3D v2, Vector3D v3) {
-        this.m = new Array2DRowRealMatrix();
+        this.m = new Array2DRowRealMatrix(3,3);
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
         this.q = new Quaternion(0,0,0,1);
 
-        this.m.createMatrix(3,3);
         this.m.setRow(0, this.v1.toArray());
         this.m.setRow(1, this.v2.toArray());
         this.m.setRow(2, this.v3.toArray());

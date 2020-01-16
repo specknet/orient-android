@@ -88,7 +88,7 @@ public class OrientationOrient extends BaseFilter {
     }
 
     public boolean isBaseOrientationSet() {
-        return rotationVectorImusim != null;
+        return orientCF != null;
     }
 
     private static float[] doubleToFloat(double[] values) {
