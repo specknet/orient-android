@@ -525,31 +525,31 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             //float[] q = orientationKalman.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
             float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
-            String report = String.format("0,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3]);
+            String report = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3], accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
 
-            String report2 = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
+            //String report2 = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
 
             Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
 
 
-            /*msg_length = report.length();
+            msg_length = report.length();
             message = report.getBytes();
             p = new DatagramPacket(message, msg_length, local, port);
             try {
                 s.send(p);
             } catch (IOException e) {
                 Log.i("MainActivity", "Exception " + e.getMessage());
-            }*/
+            }
 
 
-            msg_length = report2.length();
+            /*msg_length = report2.length();
             message = report2.getBytes();
             p2 = new DatagramPacket(message, msg_length, local, port2);
             try {
                 s2.send(p2);
             } catch (IOException e) {
                 Log.i("MainActivity", "Exception " + e.getMessage());
-            }
+            }*/
 
         }
 
