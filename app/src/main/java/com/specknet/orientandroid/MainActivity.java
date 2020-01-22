@@ -525,7 +525,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             //float[] q = orientationKalman.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
             float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
-            String report = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", q[0], q[1], q[2], q[3], accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
+            String report = String.format("0,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f", q[0], q[1], q[2], q[3], accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
 
             //String report2 = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
 
