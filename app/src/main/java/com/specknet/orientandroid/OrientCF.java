@@ -86,17 +86,11 @@ public class OrientCF {
             Quaternion qMeas = this._vectorObservation.process(accel_v3d.negate(), mag_v3d);
 
             if (this.qHat.dotProduct(qMeas) < 0.0) {
-
                 qMeas = qMeas.multiply(-1.0);
             }
-
-            return qMeas;
+            Quaternion qError = qMeas.subtract(qHat);
+            this.qHat = this.qHat.add(qError.multiply((1.0 / this._k) * dt));
         }
-
-//                Quaternion qError = qMeas.subtract(qHat);
-//                this.qHat = this.qHat.add(qError.multiply((1.0 / this._k) * dt));
-//            }
-//        }
         this.qHat = this.qHat.normalize();
         return this.qHat;
 
