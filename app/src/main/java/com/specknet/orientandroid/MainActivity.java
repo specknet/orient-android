@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -53,6 +54,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import javax.vecmath.Vector3f;
+
+import static java.lang.Math.atan2;
 
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener, SensorEventListener {
 
@@ -138,6 +141,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private float[] latest_mag;
 
     private SensorManager sensorManager;
+    private Sensor mSensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,16 +175,35 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
+    public final void onSensorChanged(SensorEvent event) {
+        // The light sensor returns a single value.
+        // Many sensors return 3 values, one for each axis.
+        float tablet_mag_x = event.values[0];
+        float tablet_mag_y = event.values[1];
+        float tablet_mag_z = event.values[2];
+
+        float heading = (float)atan2(tablet_mag_y, tablet_mag_x);
+        Log.i("MainActivity", "Heading: " + heading);
+
+
+    }
+
+    public final void onAccuracyChanged(Sensor s,int i) {
+
+    }
+
     private void runApp() {
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null){
             // Success! There's a magnetometer.
             Log.i("MainActivity", "Has Magnetometer");
+            mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         } else {
             Log.i("MainActivity", "No Magnetometer");
         }
 
+        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME );
 
         path = Environment.getExternalStorageDirectory();
 
@@ -624,4 +647,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             counter += 1;
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }
+
 }
