@@ -3,6 +3,9 @@ package com.specknet.orientandroid;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -51,7 +54,7 @@ import java.net.UnknownHostException;
 
 import javax.vecmath.Vector3f;
 
-public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
+public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener, SensorEventListener {
 
     // test device - replace with the real BLE address of your sensor, which you can find
     // by scanning for devices with the NRF Connect App
@@ -63,7 +66,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     private static final int UDP_PORT = 5555;
     private static final int UDP_PORT2 = 5556;
-    private static final String HOST_NAME = "192.168.137.1";
+    //private static final String HOST_NAME = "192.168.137.1";
+    private static final String HOST_NAME = "127.0.0.1";
     private static final boolean raw = true;
 
     private RxBleDevice orient_device;
@@ -133,6 +137,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     private float[] latest_mag;
 
+    private SensorManager sensorManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,6 +172,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     }
 
     private void runApp() {
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null){
+            // Success! There's a magnetometer.
+            Log.i("MainActivity", "Has Magnetometer");
+        } else {
+            Log.i("MainActivity", "No Magnetometer");
+        }
+
+
         path = Environment.getExternalStorageDirectory();
 
         start_button = findViewById(R.id.start_button);
