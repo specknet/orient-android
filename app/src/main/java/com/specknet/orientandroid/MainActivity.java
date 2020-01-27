@@ -185,6 +185,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         float heading = tablet_mag_x;
         Log.i("MainActivity", "Heading: " + heading);
 
+        String report2 = String.format("%.2f", heading);
+        p2 = new DatagramPacket(report2.getBytes(), report2.length(), local, port2);
+        try {
+            s2.send(p2);
+        } catch (IOException e) {
+            Log.i("MainActivity", "Exception " + e.getMessage());
+        }
+
 
     }
 
@@ -579,17 +587,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             } catch (IOException e) {
                 Log.i("MainActivity", "Exception " + e.getMessage());
             }
-
-
-            /*msg_length = report2.length();
-            message = report2.getBytes();
-            p2 = new DatagramPacket(message, msg_length, local, port2);
-            try {
-                s2.send(p2);
-            } catch (IOException e) {
-                Log.i("MainActivity", "Exception " + e.getMessage());
-            }*/
-
         }
 
         if (logging) {
