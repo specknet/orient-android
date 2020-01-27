@@ -182,7 +182,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         float tablet_mag_y = event.values[1];
         float tablet_mag_z = event.values[2];
 
-        float heading = (float)atan2(tablet_mag_y, tablet_mag_x);
+        float heading = tablet_mag_x;
         Log.i("MainActivity", "Heading: " + heading);
 
 
@@ -198,7 +198,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null){
             // Success! There's a magnetometer.
             Log.i("MainActivity", "Has Magnetometer");
-            mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         } else {
             Log.i("MainActivity", "No Magnetometer");
         }
