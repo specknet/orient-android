@@ -59,7 +59,7 @@ import javax.vecmath.Vector3f;
 
 import static java.lang.Math.atan2;
 
-public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener, SensorEventListener {
+public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     // test device - replace with the real BLE address of your sensor, which you can find
     // by scanning for devices with the NRF Connect App
@@ -70,9 +70,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
     private static final int UDP_PORT = 5555;
-    private static final int UDP_PORT2 = 5556;
     //private static final String HOST_NAME = "192.168.137.1";
-    private static final String HOST_NAME = "127.0.0.1";
+    static final String HOST_NAME = "127.0.0.1";
     private static final boolean raw = true;
 
     private RxBleDevice orient_device;
@@ -81,15 +80,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private ByteBuffer packetData;
 
     private int port;
-    private int port2;
     private DatagramSocket s;
     private InetAddress local;
-    private DatagramSocket s2;
-    private InetAddress local2;
+
     private int msg_length;
     private byte[] message;
     private DatagramPacket p;
-    private DatagramPacket p2;
+
 
     //private int n = 0;
     private Long connected_timestamp = null;
@@ -142,8 +139,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
     private float[] latest_mag;
 
-    private SensorManager sensorManager;
-    private Sensor mSensor;
+    static SensorManager sensorManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,46 +177,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-    public final void onSensorChanged(SensorEvent event) {
-        // The light sensor returns a single value.
-        // Many sensors return 3 values, one for each axis.
-        float tablet_mag_x = event.values[0];
-        float tablet_mag_y = event.values[1];
-        float tablet_mag_z = event.values[2];
-
-        float heading = tablet_mag_x;
-        Log.i("MainActivity", "Heading: " + heading);
-
-        String report2 = String.format("%.2f", heading);
-        p2 = new DatagramPacket(report2.getBytes(), report2.length(), local, port2);
-        try {
-            s2.send(p2);
-        } catch (IOException e) {
-            Log.i("MainActivity", "Exception " + e.getMessage());
-        }
-
-
-    }
-
-    public final void onAccuracyChanged(Sensor s,int i) {
-
-    }
-
     private void runApp() {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Intent intent = new Intent(this, MyService.class);
         startService(intent);
-
-
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null){
-            // Success! There's a magnetometer.
-            Log.i("MainActivity", "Has Magnetometer");
-            mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        } else {
-            Log.i("MainActivity", "No Magnetometer");
-        }
-
-        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME );
 
         path = Environment.getExternalStorageDirectory();
 
@@ -380,19 +341,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         });
 
         port = UDP_PORT;
-        port2 = UDP_PORT2;
+
         try {
             s = new DatagramSocket();
             local = Inet4Address.getByName(HOST_NAME);
         } catch (Exception e) {
             Log.i("MainActivity", e.getMessage());
         }
-        try {
-            s2 = new DatagramSocket();
-            local2 = Inet4Address.getByName(HOST_NAME);
-        } catch (Exception e) {
-            Log.i("MainActivity", e.getMessage());
-        }
+
 
         packetData = ByteBuffer.allocate(18);
         packetData.order(ByteOrder.LITTLE_ENDIAN);
