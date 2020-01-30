@@ -3,6 +3,7 @@ package com.specknet.orientandroid;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -205,6 +206,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     }
 
     private void runApp() {
+        Intent intent = new Intent(this, MyService.class);
+        startService(intent);
+
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null){
