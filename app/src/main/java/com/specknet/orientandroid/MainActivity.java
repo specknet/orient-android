@@ -2,6 +2,8 @@ package com.specknet.orientandroid;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -181,6 +183,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Intent intent = new Intent(this, MyService.class);
         startService(intent);
+
 
         path = Environment.getExternalStorageDirectory();
 

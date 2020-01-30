@@ -1,6 +1,8 @@
 package com.specknet.orientandroid;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -29,6 +31,7 @@ public class MyService extends IntentService implements SensorEventListener {
     private InetAddress local2;
     private DatagramPacket p2;
     private Sensor mSensor;
+    private int ONGOING_NOTIFICATION_ID = 123789;
 
     /**
      * A constructor is required, and must call the super <code><a href="/reference/android/app/IntentService.html#IntentService(java.lang.String)">IntentService(String)</a></code>
@@ -36,6 +39,24 @@ public class MyService extends IntentService implements SensorEventListener {
      */
     public MyService() {
         super("MyService");
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        Notification notification =
+                new Notification.Builder(this)
+                        .setContentTitle(("Hello"))
+                        .setContentText(("Message"))
+                        .setSmallIcon(R.drawable.vec_wireless_active)
+                        .setContentIntent(pendingIntent)
+                        .setTicker(("Ticker"))
+                        .build();
+
+        Log.i("MyService", "Starting in foreground");
+
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
+
         mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         port2 = UDP_PORT2;
 
