@@ -8,17 +8,36 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+
+import static com.specknet.orientandroid.MainActivity.HOST_NAME;
+import static com.specknet.orientandroid.MainActivity.sensorManager;
+
 /**
  * Service which sends android orientation sensor data to Unity via UDP
  */
 
-public class MyService2 extends Service  {
+public class MyService2 extends Service implements SensorEventListener {
+    private static final int UDP_PORT2 = 5556;
 
+    private int port2;
+    private DatagramSocket s2;
+    private InetAddress local2;
+    private DatagramPacket p2;
+    private Sensor mSensor;
 
     // Just in case there could be a conflict with another notification, we give it a high "random" integer
     private final int SERVICE_NOTIFICATION_ID = 9148519;
@@ -41,6 +60,7 @@ public class MyService2 extends Service  {
             @Override
             public void run() {
                 Log.i("MyService2", "Starting Sensor service...");
+                setupSensors();
 
                 /*
                 //String channel = createChannel();
@@ -59,8 +79,59 @@ public class MyService2 extends Service  {
             */
             }
         }.start();
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
+
+    private void setupSensors(){
+        mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        port2 = UDP_PORT2;
+
+        try {
+            s2 = new DatagramSocket();
+            local2 = Inet4Address.getByName(HOST_NAME);
+        } catch (Exception e) {
+            Log.i("MyService2", e.getMessage());
+        }
+
+        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME );
+
+        while(true) {
+            try {
+                Thread.sleep(1000);
+                Log.i("MyService2", "Hello");
+            } catch (InterruptedException e) {
+                // Restore interrupt status.
+                Thread.currentThread().interrupt();
+            }
+        }
+
+    }
+
+    public final void onSensorChanged(SensorEvent event) {
+        // The light sensor returns a single value.
+        // Many sensors return 3 values, one for each axis.
+        float tablet_mag_x = event.values[0];
+        float tablet_mag_y = event.values[1];
+        float tablet_mag_z = event.values[2];
+
+        float heading = tablet_mag_x;
+        Log.i("MyService2", "Heading: " + heading);
+
+        String report2 = String.format("%.2f", heading);
+        p2 = new DatagramPacket(report2.getBytes(), report2.length(), local2, port2);
+        try {
+            s2.send(p2);
+        } catch (IOException e) {
+            Log.i("MyService2", "Exception " + e.getMessage());
+        }
+
+
+    }
+
+    public final void onAccuracyChanged(Sensor s, int i) {
+
+    }
+
 
     private void startMyOwnForeground(){
         String NOTIFICATION_CHANNEL_ID = "com.specknet.orientandroid";
@@ -79,7 +150,7 @@ public class MyService2 extends Service  {
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
-        startForeground(2, notification);
+        startForeground(SERVICE_NOTIFICATION_ID, notification);
     }
 
     @Override

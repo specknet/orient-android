@@ -18,7 +18,9 @@
         <service
             android:name=".MyService2"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false"
+            android:stopWithTask="true">
+        </service>
         <service
             android:name=".MyService"
             android:enabled="true"
