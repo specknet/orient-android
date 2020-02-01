@@ -180,6 +180,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     }
 
     private void runApp() {
+
+        //startDiaryApp(getActivity(), "com.specknet.rehabdiary");
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Intent intent = new Intent(this, MyService2.class);
         startService(intent);
