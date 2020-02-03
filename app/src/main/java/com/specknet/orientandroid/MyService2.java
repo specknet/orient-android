@@ -117,8 +117,15 @@ public class MyService2 extends Service implements SensorEventListener {
         float heading = tablet_mag_x;
         Log.i("MyService2", "Heading: " + heading);
 
-        float pitch = tablet_mag_y;
+        float pitch = tablet_mag_z;
+        if (tablet_mag_y > 90.f || tablet_mag_y < -90.f) {
+            pitch = pitch - 90.f;
+        }
+        else {
+            pitch = -pitch + 90.f;
+        }
         Log.i("MyService2", "pitch: " + pitch);
+        Log.i("MyService2", "y: " + tablet_mag_y);
 
 
         String report2 = String.format("%.2f,%.2f", heading, pitch);
