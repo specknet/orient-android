@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
 
     private static final int UDP_PORT = 5555;
-    //private static final String HOST_NAME = "192.168.137.1";
+    //static final String HOST_NAME = "192.168.137.1";
     static final String HOST_NAME = "127.0.0.1";
     private static final boolean raw = true;
 
