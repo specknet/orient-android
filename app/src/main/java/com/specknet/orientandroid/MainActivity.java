@@ -66,14 +66,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     // test device - replace with the real BLE address of your sensor, which you can find
     // by scanning for devices with the NRF Connect App
 
-    //private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
-    private static final String ORIENT_BLE_ADDRESS = "C2:28:8B:24:8E:CB";
+    private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
+    //private static final String ORIENT_BLE_ADDRESS = "C2:28:8B:24:8E:CB";
 
-    private static final float SAMPLE_RATE = 25.0f;
+    private static final float SAMPLE_RATE = 50.0f;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
-    //private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
-    private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
+    private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
+    //private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
     private static final int UDP_PORT = 5555;
     //static final String HOST_NAME = "192.168.137.1";
