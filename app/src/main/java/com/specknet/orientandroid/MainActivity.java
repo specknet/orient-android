@@ -66,14 +66,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     // test device - replace with the real BLE address of your sensor, which you can find
     // by scanning for devices with the NRF Connect App
 
-    private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
-    //private static final String ORIENT_BLE_ADDRESS = "C2:28:8B:24:8E:CB";
+    //private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
+    private static final String ORIENT_BLE_ADDRESS = "C2:28:8B:24:8E:CB";
 
     private static final float SAMPLE_RATE = 25.0f;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
-    private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
-    //private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
+    //private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
+    private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
     private static final int UDP_PORT = 5555;
     //static final String HOST_NAME = "192.168.137.1";
@@ -541,10 +541,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         }
 
         if (latest_mag != null) {
-            //float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/50.0f);
+            float[] q = orientationGyroscope.calculateOrientation(new float[]{gyro_x * (float)Math.PI / 180f,gyro_y * (float)Math.PI / 180f,gyro_z * (float)Math.PI / 180f}, 1.0f/SAMPLE_RATE);
             //float[] q = orientationFusion.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
             //float[] q = orientationKalman.calculateFusedOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / 50.0f, new float[]{accel_x, accel_y, accel_z}, latest_mag);
-            float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / SAMPLE_RATE, new float[]{accel_x, accel_y, accel_z}, latest_mag);
+            //float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / SAMPLE_RATE, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
             String report = String.format("0,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f", q[0], q[1], q[2], q[3], accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
 
