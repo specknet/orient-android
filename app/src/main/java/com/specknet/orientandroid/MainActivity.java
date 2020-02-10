@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     //private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
     private static final String ORIENT_BLE_ADDRESS = "C2:28:8B:24:8E:CB";
 
-    private static final float SAMPLE_RATE = 25.0f;
+    private static final float SAMPLE_RATE = 10.0f;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     //private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
