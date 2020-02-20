@@ -56,6 +56,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import javax.vecmath.Vector3f;
 
@@ -75,23 +77,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     //private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
     private static final String ORIENT_RAW_CHARACTERISTIC = "00001527-1212-efde-1523-785feabcd125";
 
-    private static final int UDP_PORT = 5555;
+    public static BlockingQueue queue;
+
+    public static final int UDP_PORT = 5555;
     //static final String HOST_NAME = "192.168.137.1";
-    static final String HOST_NAME = "127.0.0.1";
+    public static final String HOST_NAME = "127.0.0.1";
     private static final boolean raw = true;
 
     private RxBleDevice orient_device;
     private Disposable scanSubscription;
     private RxBleClient rxBleClient;
     private ByteBuffer packetData;
-
-    private int port;
-    private DatagramSocket s;
-    private InetAddress local;
-
-    private int msg_length;
-    private byte[] message;
-    private DatagramPacket p;
 
 
     //private int n = 0;
@@ -153,6 +149,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ctx = this;
+        queue = new ArrayBlockingQueue(25 * 4);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -350,14 +347,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             start_button.setEnabled(true);
         });
 
-        port = UDP_PORT;
-
-        try {
-            s = new DatagramSocket();
-            local = Inet4Address.getByName(HOST_NAME);
-        } catch (Exception e) {
-            Log.i("MainActivity", e.getMessage());
-        }
 
 
         packetData = ByteBuffer.allocate(18);
@@ -493,14 +482,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         String report = String.format("0,%.2f,%.2f,%.2f,%.2f", dw, dx, dy, dz);
 
-        msg_length = report.length();
-        message = report.getBytes();
-        p = new DatagramPacket(message, msg_length, local, port);
-        try {
-            s.send(p);
-        } catch (IOException e){
-            Log.i("MainActivity", "Exception " + e.getMessage());
-        }
     }
 
     private void handleRawPacket(final byte[] bytes) {
@@ -547,12 +528,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             //float[] q = orientationOrient.calculateOrientation(new float[]{gyro_x * (float) Math.PI / 180f, gyro_y * (float) Math.PI / 180f, gyro_z * (float) Math.PI / 180f}, 1.0f / SAMPLE_RATE, new float[]{accel_x, accel_y, accel_z}, latest_mag);
 
             String report = String.format("0,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f", q[0], q[1], q[2], q[3], accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
-
             //String report2 = String.format("0,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z, latest_mag[0], latest_mag[1], latest_mag[2]);
 
             Log.i("OrientAndroid", "Quat:(" + q[0] + ", " + q[1] + ", " + q[2] + ", " + q[3] + ")");
 
+            queue.add(report);
 
+            /*
             msg_length = report.length();
             message = report.getBytes();
             p = new DatagramPacket(message, msg_length, local, port);
@@ -561,6 +543,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             } catch (IOException e) {
                 Log.i("MainActivity", "Exception " + e.getMessage());
             }
+             */
         }
 
         if (logging) {

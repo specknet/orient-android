@@ -24,6 +24,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 
 import static com.specknet.orientandroid.MainActivity.HOST_NAME;
+import static com.specknet.orientandroid.MainActivity.UDP_PORT;
 import static com.specknet.orientandroid.MainActivity.sensorManager;
 
 /**
@@ -38,6 +39,14 @@ public class MyService2 extends Service implements SensorEventListener {
     private InetAddress local2;
     private DatagramPacket p2;
     private Sensor mSensor;
+
+    private int msg_length;
+    private byte[] message;
+    private DatagramPacket p;
+
+    private int port;
+    private InetAddress local;
+    private DatagramSocket s;
 
     // Just in case there could be a conflict with another notification, we give it a high "random" integer
     private final int SERVICE_NOTIFICATION_ID = 9148519;
@@ -93,12 +102,37 @@ public class MyService2 extends Service implements SensorEventListener {
             Log.i("MyService2", e.getMessage());
         }
 
+        port = UDP_PORT;
+
+        try {
+            s = new DatagramSocket();
+            local = Inet4Address.getByName(HOST_NAME);
+        } catch (Exception e) {
+            Log.i("MainActivity", e.getMessage());
+        }
+
         sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME );
 
         while(true) {
             try {
-                Thread.sleep(1000);
-                Log.i("MyService2", "Hello");
+                Log.i("MyService2", "qn: " + MainActivity.queue.size());
+                if (MainActivity.queue.size() > 50) {
+                    String report = (String)MainActivity.queue.poll();
+                    msg_length = report.length();
+                    message = report.getBytes();
+                    p = new DatagramPacket(message, msg_length, local, port);
+                    try {
+                        s.send(p);
+                    } catch (IOException e) {
+                        Log.i("MainActivity", "Exception " + e.getMessage());
+                    }
+                }
+
+                if (MainActivity.queue.size() > 1)
+                    Thread.sleep(1000/(MainActivity.queue.size()/2));
+                else
+                    Thread.sleep(1000/25);
+
             } catch (InterruptedException e) {
                 // Restore interrupt status.
                 Thread.currentThread().interrupt();
