@@ -116,7 +116,7 @@ public class MyService2 extends Service implements SensorEventListener {
         while(true) {
             try {
                 Log.i("MyService2", "qn: " + MainActivity.queue.size());
-                if (MainActivity.queue.size() > 25) {
+                if (MainActivity.queue.size() > 50) {
                     String report = (String)MainActivity.queue.poll();
                     msg_length = report.length();
                     message = report.getBytes();

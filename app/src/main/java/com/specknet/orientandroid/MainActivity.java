@@ -149,7 +149,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ctx = this;
-        queue = new ArrayBlockingQueue(25 * 2);
+        queue = new ArrayBlockingQueue(25 * 4);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
