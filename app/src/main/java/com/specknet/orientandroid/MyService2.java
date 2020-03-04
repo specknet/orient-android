@@ -116,7 +116,7 @@ public class MyService2 extends Service implements SensorEventListener {
         while(true) {
             try {
                 Log.i("MyService2", "qn: " + MainActivity.queue.size());
-                if (MainActivity.queue.size() > 50) {
+                if (MainActivity.queue.size() > 5) {
                     String report = (String)MainActivity.queue.poll();
                     msg_length = report.length();
                     message = report.getBytes();
@@ -129,8 +129,9 @@ public class MyService2 extends Service implements SensorEventListener {
                 }
 
                 if (MainActivity.queue.size() > 1)
-                    Thread.sleep(1000/(MainActivity.queue.size()/2));
+                    Thread.sleep(1000/(MainActivity.queue.size()*4));
                 else
+                    //Log.i("MyService2", "Queue empty");
                     Thread.sleep(1000/25);
 
             } catch (InterruptedException e) {
