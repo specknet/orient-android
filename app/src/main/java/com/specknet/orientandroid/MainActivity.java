@@ -69,9 +69,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     // by scanning for devices with the NRF Connect App
 
     //private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
-    private static final String ORIENT_BLE_ADDRESS = "F4:D9:CB:46:8A:D7";
+    private static final String ORIENT_BLE_ADDRESS = "D0:95:B4:A4:34:A5";
 
-    private static final float SAMPLE_RATE = 25.0f;
+    private static final float SAMPLE_RATE = 40.0f;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     //private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
@@ -490,17 +490,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         packetData.put(bytes);
         packetData.position(0);
 
-        float accel_x = packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
-        float accel_y = packetData.getShort() / 1024.f;
-        float accel_z = packetData.getShort() / 1024.f;
+        float accel_x = 0.f; //packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
+        float accel_y = 0.f; //packetData.getShort() / 1024.f;
+        float accel_z = 0.f; //packetData.getShort() / 1024.f;
 
-        float gyro_x = packetData.getShort() / 32.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
-        float gyro_y = packetData.getShort() / 32.f;
-        float gyro_z = packetData.getShort() / 32.f;
+        float gyro_x = packetData.getShort() / 128.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
+        float gyro_y = packetData.getShort() / 128.f;
+        float gyro_z = packetData.getShort() / 128.f;
 
-        float mag_x = packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
-        float mag_y = packetData.getShort() / 16.f;
-        float mag_z = packetData.getShort() / 16.f;
+        float mag_x = 0.f; //packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
+        float mag_y = 0.f; //packetData.getShort() / 16.f;
+        float mag_z = 0.f; //packetData.getShort() / 16.f;
 
         //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
         Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
@@ -514,7 +514,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         accel_z = va.getZ();
 
 
-        if (mag_x != 0.f || mag_y != 0.f || mag_z != 0.f)
+        if (true || mag_x != 0.f || mag_y != 0.f || mag_z != 0.f) //mag not working yet
         {
             Vector3f v = new Vector3f(mag_x, mag_y, mag_z);
             //v.normalize();
