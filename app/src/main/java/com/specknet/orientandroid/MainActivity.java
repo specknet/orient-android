@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     //private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
     private static final String ORIENT_BLE_ADDRESS = "D0:95:B4:A4:34:A5";
 
-    private static final float SAMPLE_RATE = 40.0f;
+    private static final float SAMPLE_RATE = 50.0f;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     //private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
@@ -189,7 +189,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Intent intent = new Intent(this, MyService2.class);
-        startService(intent);
+        //startService(intent);
 
 
         path = Environment.getExternalStorageDirectory();
@@ -513,16 +513,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         float accel_y = 0.f; //packetData.getShort() / 1024.f;
         float accel_z = 0.f; //packetData.getShort() / 1024.f;
 
-        float gyro_x = packetData.getShort() / 128.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
-        float gyro_y = packetData.getShort() / 128.f;
-        float gyro_z = packetData.getShort() / 128.f;
+        float gyro_x = packetData.getShort() / 64.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
+        float gyro_y = packetData.getShort() / 64.f;
+        float gyro_z = packetData.getShort() / 64.f;
 
         float mag_x = 0.f; //packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
         float mag_y = 0.f; //packetData.getShort() / 16.f;
         float mag_z = 0.f; //packetData.getShort() / 16.f;
 
         //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
-        Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
+        //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
         //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
