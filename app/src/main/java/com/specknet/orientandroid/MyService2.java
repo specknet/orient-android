@@ -162,7 +162,7 @@ public class MyService2 extends Service implements SensorEventListener {
         Log.i("MyService2", "pitch: " + pitch);
         Log.i("MyService2", "y: " + tablet_mag_y);
 
-
+/*
         String report2 = String.format("%.2f,%.2f", heading, pitch);
         p2 = new DatagramPacket(report2.getBytes(), report2.length(), local2, port2);
         try {
@@ -170,7 +170,7 @@ public class MyService2 extends Service implements SensorEventListener {
         } catch (IOException e) {
             Log.i("MyService2", "Exception " + e.getMessage());
         }
-
+*/
 
     }
 
