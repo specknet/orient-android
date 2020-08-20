@@ -509,20 +509,20 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         packetData.put(bytes);
         packetData.position(0);
 
-        float accel_x = 0.f; //packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
-        float accel_y = 0.f; //packetData.getShort() / 1024.f;
-        float accel_z = 0.f; //packetData.getShort() / 1024.f;
-
         float gyro_x = packetData.getShort() / 64.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
         float gyro_y = packetData.getShort() / 64.f;
         float gyro_z = packetData.getShort() / 64.f;
+
+        float accel_x = packetData.getShort() / 16384.f; //packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
+        float accel_y = packetData.getShort() / 16384.f; //packetData.getShort() / 1024.f;
+        float accel_z = packetData.getShort() / 16384.f; //packetData.getShort() / 1024.f;
 
         float mag_x = 0.f; //packetData.getShort() / 16.f;  // integer part: 12 bits, fractional part 4 bits, so div by 2^4
         float mag_y = 0.f; //packetData.getShort() / 16.f;
         float mag_z = 0.f; //packetData.getShort() / 16.f;
 
-        //Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
-        //Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
+        Log.i("OrientAndroid", "Accel:(" + accel_x + ", " + accel_y + ", " + accel_z + ")");
+        Log.i("OrientAndroid", "Gyro:(" + gyro_x + ", " + gyro_y + ", " + gyro_z + ")");
         //if (mag_x != 0f || mag_y != 0f || mag_z != 0f)
             //Log.i("OrientAndroid", "Mag:(" + mag_x + ", " + mag_y + ", " + mag_z + ")");
 
