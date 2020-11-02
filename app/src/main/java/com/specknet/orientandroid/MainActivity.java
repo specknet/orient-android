@@ -67,9 +67,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     // by scanning for devices with the NRF Connect App
 
     //private static final String ORIENT_BLE_ADDRESS = "D5:71:F3:51:9E:73";
-    private static final String ORIENT_BLE_ADDRESS = "D0:95:B4:A4:34:A5";
+    private static final String ORIENT_BLE_ADDRESS = "D6:91:DD:9C:24:7A";
 
-    private static final float SAMPLE_RATE = 50.0f;
+    private static final float SAMPLE_RATE = 25.0f;
 
     private static final String ORIENT_QUAT_CHARACTERISTIC = "ef680404-9b35-4933-9b10-52ffa9740042";
     //private static final String ORIENT_RAW_CHARACTERISTIC = "ef680406-9b35-4933-9b10-52ffa9740042";
@@ -509,9 +509,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         packetData.put(bytes);
         packetData.position(0);
 
-        float gyro_x = packetData.getShort() / 64.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
-        float gyro_y = packetData.getShort() / 64.f;
-        float gyro_z = packetData.getShort() / 64.f;
+        float gyro_x = packetData.getShort() / 128.f;  // integer part: 11 bits, fractional part 5 bits, so div by 2^5
+        float gyro_y = packetData.getShort() / 128.f;
+        float gyro_z = packetData.getShort() / 128.f;
 
         float accel_x = packetData.getShort() / 16384.f; //packetData.getShort() / 1024.f;  // integer part: 6 bits, fractional part 10 bits, so div by 2^10
         float accel_y = packetData.getShort() / 16384.f; //packetData.getShort() / 1024.f;
