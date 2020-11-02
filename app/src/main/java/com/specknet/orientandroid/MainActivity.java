@@ -189,7 +189,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Intent intent = new Intent(this, MyService2.class);
-        //startService(intent);
+        startService(intent);
 
 
         path = Environment.getExternalStorageDirectory();
